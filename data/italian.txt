@@ -1,0 +1,232 @@
+AF|Afghanistan|Kabul
+AL|Albania|Tirana
+DZ|Algeria|Algeri
+AD|Andorra|Andorra la Vella
+AO|Angola|Luanda
+AG|Antigua e Barbuda|Saint John's
+AR|Argentina|Buenos Aires
+AM|Armenia|Erevan
+AU|Australia|Canberra
+AT|Austria|Vienna
+AZ|Azerbaigian|Baku
+BS|Bahamas|Nassau
+BH|Bahrein|Manama
+BD|Bangladesh|Dacca
+BB|Barbados|Bridgetown
+BY|Bielorussia|Minsk
+BE|Belgio|Bruxelles
+BZ|Belize|Belmopan
+BJ|Benin|Porto-Novo
+BT|Bhutan|Thimphu
+BO|Bolivia|Sucre
+BA|Bosnia ed Erzegovina|Sarajevo
+BW|Botswana|Gaborone
+BR|Brasile|Brasilia
+BN|Brunei|Bandar Seri Begawan
+BG|Bulgaria|Sofia
+BF|Burkina Faso|Ouagadougou
+BI|Burundi|Gitega
+CV|Capo Verde|Praia
+KH|Cambogia|Phnom Penh
+CM|Camerun|Yaoundé
+CA|Canada|Ottawa
+CF|Repubblica Centrafricana|Bangui
+TD|Ciad|N'Djamena
+CL|Cile|Santiago del Cile
+CN|Cina|Pechino
+CO|Colombia|Bogotà
+KM|Comore|Moroni
+CG|Repubblica del Congo|Brazzaville
+CD|Repubblica Democratica del Congo|Kinshasa
+CR|Costa Rica|San José
+CI|Costa d'Avorio|Yamoussoukro
+HR|Croazia|Zagabria
+CU|Cuba|L'Avana
+CY|Cipro|Nicosia
+CZ|Cechia|Praga
+DK|Danimarca|Copenaghen
+DJ|Gibuti|Gibuti
+DM|Dominica|Roseau
+DO|Repubblica Dominicana|Santo Domingo
+EC|Ecuador|Quito
+EG|Egitto|Il Cairo
+SV|El Salvador|San Salvador
+GQ|Guinea Equatoriale|Malabo
+ER|Eritrea|Asmara
+EE|Estonia|Tallinn
+SZ|Eswatini|Mbabane
+ET|Etiopia|Addis Abeba
+FJ|Figi|Suva
+FI|Finlandia|Helsinki
+FR|Francia|Parigi
+GA|Gabon|Libreville
+GM|Gambia|Banjul
+GE|Georgia|Tbilisi
+DE|Germania|Berlino
+GH|Ghana|Accra
+GR|Grecia|Atene
+GD|Grenada|Saint George's
+GT|Guatemala|Città del Guatemala
+GN|Guinea|Conakry
+GW|Guinea-Bissau|Bissau
+GY|Guyana|Georgetown
+HT|Haiti|Port-au-Prince
+HN|Honduras|Tegucigalpa
+HU|Ungheria|Budapest
+IS|Islanda|Reykjavík
+IN|India|Nuova Delhi
+ID|Indonesia|Giacarta
+IR|Iran|Teheran
+IQ|Iraq|Baghdad
+IE|Irlanda|Dublino
+IL|Israele|
+IT|Italia|Roma
+JM|Giamaica|Kingston
+JP|Giappone|Tokyo
+JO|Giordania|Amman
+KZ|Kazakistan|Astana
+KE|Kenya|Nairobi
+KI|Kiribati|Tarawa
+KP|Corea del Nord|Pyongyang
+KR|Corea del Sud|Seul
+XK|Kosovo|Pristina
+KW|Kuwait|Kuwait City
+KG|Kirghizistan|Bishkek
+LA|Laos|Vientiane
+LV|Lettonia|Riga
+LB|Libano|Beirut
+LS|Lesotho|Maseru
+LR|Liberia|Monrovia
+LY|Libia|Tripoli
+LI|Liechtenstein|Vaduz
+LT|Lituania|Vilnius
+LU|Lussemburgo|Lussemburgo
+MG|Madagascar|Antananarivo
+MW|Malawi|Lilongwe
+MY|Malaysia|Kuala Lumpur
+MV|Maldive|Malé
+ML|Mali|Bamako
+MT|Malta|La Valletta
+MH|Isole Marshall|Majuro
+MR|Mauritania|Nouakchott
+MU|Mauritius|Port Louis
+MX|Messico|Città del Messico
+FM|Micronesia|Palikir
+MD|Moldavia|Chișinău
+MC|Monaco|Monaco
+MN|Mongolia|Ulan Bator
+ME|Montenegro|Podgorica
+MA|Marocco|Rabat
+MZ|Mozambico|Maputo
+MM|Myanmar|Naypyidaw
+NA|Namibia|Windhoek
+NR|Nauru|Yaren
+NP|Nepal|Katmandu
+NL|Paesi Bassi|Amsterdam
+NZ|Nuova Zelanda|Wellington
+NI|Nicaragua|Managua
+NE|Niger|Niamey
+NG|Nigeria|Abuja
+MK|Macedonia del Nord|Skopje
+NO|Norvegia|Oslo
+OM|Oman|Mascate
+PK|Pakistan|Islamabad
+PW|Palau|Ngerulmud
+PS|Palestina|
+PA|Panama|Panama
+PG|Papua Nuova Guinea|Port Moresby
+PY|Paraguay|Asunción
+PE|Perù|Lima
+PH|Filippine|Manila
+PL|Polonia|Varsavia
+PT|Portogallo|Lisbona
+QA|Qatar|Doha
+RO|Romania|Bucarest
+RU|Russia|Mosca
+RW|Ruanda|Kigali
+KN|Saint Kitts e Nevis|Basseterre
+LC|Santa Lucia|Castries
+VC|Saint Vincent e Grenadine|Kingstown
+WS|Samoa|Apia
+SM|San Marino|San Marino
+ST|São Tomé e Príncipe|São Tomé
+SA|Arabia Saudita|Riad
+SN|Senegal|Dakar
+RS|Serbia|Belgrado
+SC|Seychelles|Victoria
+SL|Sierra Leone|Freetown
+SG|Singapore|Singapore
+SK|Slovacchia|Bratislava
+SI|Slovenia|Lubiana
+SB|Isole Salomone|Honiara
+SO|Somalia|Mogadiscio
+ZA|Sudafrica|Pretoria
+SS|Sudan del Sud|Giuba
+ES|Spagna|Madrid
+LK|Sri Lanka|Colombo
+SD|Sudan|Khartum
+SR|Suriname|Paramaribo
+SE|Svezia|Stoccolma
+CH|Svizzera|Berna
+SY|Siria|Damasco
+TW|Taiwan|Taipei
+TJ|Tagikistan|Dušanbe
+TZ|Tanzania|Dodoma
+TH|Thailandia|Bangkok
+TL|Timor Est|Dili
+TG|Togo|Lomé
+TO|Tonga|Nukuʻalofa
+TT|Trinidad e Tobago|Port of Spain
+TN|Tunisia|Tunisi
+TR|Turchia|Ankara
+TM|Turkmenistan|Aşgabat
+TV|Tuvalu|Funafuti
+UG|Uganda|Kampala
+UA|Ucraina|Kiev
+AE|Emirati Arabi Uniti|Abu Dhabi
+GB|Regno Unito|Londra
+US|Stati Uniti|Washington
+UY|Uruguay|Montevideo
+UZ|Uzbekistan|Tashkent
+VU|Vanuatu|Port Vila
+VA|Città del Vaticano|Città del Vaticano
+VE|Venezuela|Caracas
+VN|Vietnam|Hanoi
+YE|Yemen|Sana'a
+ZM|Zambia|Lusaka
+ZW|Zimbabwe|Harare
+GB-ENG|Inghilterra|Londra
+GB-SCT|Scozia|Edimburgo
+GB-WLS|Galles|Cardiff
+FO|Isole Fær Øer|Tórshavn
+GI|Gibilterra|Gibilterra
+IM|Isola di Man|Douglas
+JE|Jersey|Saint Helier
+GG|Guernsey|Saint Peter Port
+AX|Isole Åland|Mariehamn
+GL|Groenlandia|Nuuk
+PR|Porto Rico|San Juan
+BM|Bermuda|Hamilton
+KY|Isole Cayman|George Town
+VG|Isole Vergini britanniche|Road Town
+VI|Isole Vergini americane|Charlotte Amalie
+AW|Aruba|Oranjestad
+CW|Curaçao|Willemstad
+TC|Turks e Caicos|Cockburn Town
+AI|Anguilla|The Valley
+MS|Montserrat|Brades
+FK|Isole Falkland|Stanley
+HK|Hong Kong|
+MO|Macao|
+EH|Sahara Occidentale|
+SH|Sant'Elena|Jamestown
+GU|Guam|Hagåtña
+AS|Samoa Americane|Pago Pago
+MP|Isole Marianne Settentrionali|Saipan
+NC|Nuova Caledonia|Nouméa
+PF|Polinesia francese|Papeete
+CK|Isole Cook|Avarua
+NU|Niue|Alofi
+NF|Isola Norfolk|Kingston
+TK|Tokelau|
+PN|Isole Pitcairn|Adamstown

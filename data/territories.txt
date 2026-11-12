@@ -1,0 +1,35 @@
+GB-ENG|England|London|Europe|2
+GB-SCT|Scotland|Edinburgh|Europe|2
+GB-WLS|Wales|Cardiff|Europe|2
+FO|Faroe Islands|Tórshavn|Europe|4
+GI|Gibraltar|Gibraltar|Europe|4
+IM|Isle of Man|Douglas|Europe|5
+JE|Jersey|Saint Helier|Europe|5
+GG|Guernsey|Saint Peter Port|Europe|5
+AX|Åland Islands|Mariehamn|Europe|5
+GL|Greenland|Nuuk|North America|3
+PR|Puerto Rico|San Juan|North America|3
+BM|Bermuda|Hamilton|North America|4
+KY|Cayman Islands|George Town|North America|5
+VG|British Virgin Islands|Road Town|North America|5
+VI|US Virgin Islands|Charlotte Amalie|North America|5
+AW|Aruba|Oranjestad|North America|4
+CW|Curaçao|Willemstad|North America|5
+TC|Turks and Caicos Islands|Cockburn Town|North America|5
+AI|Anguilla|The Valley|North America|5
+MS|Montserrat|Brades|North America|5
+FK|Falkland Islands|Stanley|South America|4
+HK|Hong Kong||Asia|3
+MO|Macau||Asia|4
+EH|Western Sahara||Africa|5
+SH|Saint Helena|Jamestown|Africa|5
+GU|Guam|Hagåtña|Oceania|5
+AS|American Samoa|Pago Pago|Oceania|5
+MP|Northern Mariana Islands|Saipan|Oceania|5
+NC|New Caledonia|Nouméa|Oceania|5
+PF|French Polynesia|Papeete|Oceania|4
+CK|Cook Islands|Avarua|Oceania|5
+NU|Niue|Alofi|Oceania|5
+NF|Norfolk Island|Kingston|Oceania|5
+TK|Tokelau||Oceania|5
+PN|Pitcairn Islands|Adamstown|Oceania|5

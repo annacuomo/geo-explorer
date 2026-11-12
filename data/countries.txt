@@ -1,0 +1,197 @@
+AF|Afghanistan|Kabul|Asia|4
+AL|Albania|Tirana|Europe|3
+DZ|Algeria|Algiers|Africa|3
+AD|Andorra|Andorra la Vella|Europe|4
+AO|Angola|Luanda|Africa|4
+AG|Antigua and Barbuda|St. John's|North America|5
+AR|Argentina|Buenos Aires|South America|1
+AM|Armenia|Yerevan|Asia|4
+AU|Australia|Canberra|Oceania|1
+AT|Austria|Vienna|Europe|2
+AZ|Azerbaijan|Baku|Asia|4
+BS|Bahamas|Nassau|North America|4
+BH|Bahrain|Manama|Asia|5
+BD|Bangladesh|Dhaka|Asia|3
+BB|Barbados|Bridgetown|North America|4
+BY|Belarus|Minsk|Europe|4
+BE|Belgium|Brussels|Europe|2
+BZ|Belize|Belmopan|North America|5
+BJ|Benin|Porto-Novo|Africa|5
+BT|Bhutan|Thimphu|Asia|3
+BO|Bolivia|Sucre|South America|4
+BA|Bosnia and Herzegovina|Sarajevo|Europe|3
+BW|Botswana|Gaborone|Africa|4
+BR|Brazil|Brasília|South America|1
+BN|Brunei|Bandar Seri Begawan|Asia|5
+BG|Bulgaria|Sofia|Europe|4
+BF|Burkina Faso|Ouagadougou|Africa|5
+BI|Burundi|Gitega|Africa|5
+CV|Cape Verde|Praia|Africa|5
+KH|Cambodia|Phnom Penh|Asia|3
+CM|Cameroon|Yaoundé|Africa|4
+CA|Canada|Ottawa|North America|1
+CF|Central African Republic|Bangui|Africa|5
+TD|Chad|N'Djamena|Africa|5
+CL|Chile|Santiago|South America|2
+CN|China|Beijing|Asia|1
+CO|Colombia|Bogotá|South America|2
+KM|Comoros|Moroni|Africa|5
+CG|Republic of the Congo|Brazzaville|Africa|5
+CD|DR Congo|Kinshasa|Africa|4
+CR|Costa Rica|San José|North America|4
+CI|Côte d'Ivoire|Yamoussoukro|Africa|4
+HR|Croatia|Zagreb|Europe|2
+CU|Cuba|Havana|North America|2
+CY|Cyprus|Nicosia|Europe|3
+CZ|Czechia|Prague|Europe|3
+DK|Denmark|Copenhagen|Europe|2
+DJ|Djibouti|Djibouti|Africa|5
+DM|Dominica|Roseau|North America|5
+DO|Dominican Republic|Santo Domingo|North America|4
+EC|Ecuador|Quito|South America|4
+EG|Egypt|Cairo|Africa|2
+SV|El Salvador|San Salvador|North America|5
+GQ|Equatorial Guinea|Malabo|Africa|5
+ER|Eritrea|Asmara|Africa|5
+EE|Estonia|Tallinn|Europe|4
+SZ|Eswatini|Mbabane|Africa|5
+ET|Ethiopia|Addis Ababa|Africa|3
+FJ|Fiji|Suva|Oceania|4
+FI|Finland|Helsinki|Europe|2
+FR|France|Paris|Europe|1
+GA|Gabon|Libreville|Africa|5
+GM|Gambia|Banjul|Africa|5
+GE|Georgia|Tbilisi|Asia|3
+DE|Germany|Berlin|Europe|1
+GH|Ghana|Accra|Africa|3
+GR|Greece|Athens|Europe|1
+GD|Grenada|St. George's|North America|5
+GT|Guatemala|Guatemala City|North America|4
+GN|Guinea|Conakry|Africa|5
+GW|Guinea-Bissau|Bissau|Africa|5
+GY|Guyana|Georgetown|South America|4
+HT|Haiti|Port-au-Prince|North America|4
+HN|Honduras|Tegucigalpa|North America|5
+HU|Hungary|Budapest|Europe|3
+IS|Iceland|Reykjavík|Europe|2
+IN|India|New Delhi|Asia|1
+ID|Indonesia|Jakarta|Asia|3
+IR|Iran|Tehran|Asia|3
+IQ|Iraq|Baghdad|Asia|4
+IE|Ireland|Dublin|Europe|1
+IL|Israel||Asia|2
+IT|Italy|Rome|Europe|1
+JM|Jamaica|Kingston|North America|2
+JP|Japan|Tokyo|Asia|1
+JO|Jordan|Amman|Asia|4
+KZ|Kazakhstan|Astana|Asia|3
+KE|Kenya|Nairobi|Africa|3
+KI|Kiribati|Tarawa|Oceania|5
+KP|North Korea|Pyongyang|Asia|4
+KR|South Korea|Seoul|Asia|1
+XK|Kosovo|Pristina|Europe|4
+KW|Kuwait|Kuwait City|Asia|4
+KG|Kyrgyzstan|Bishkek|Asia|4
+LA|Laos|Vientiane|Asia|4
+LV|Latvia|Riga|Europe|4
+LB|Lebanon|Beirut|Asia|2
+LS|Lesotho|Maseru|Africa|5
+LR|Liberia|Monrovia|Africa|4
+LY|Libya|Tripoli|Africa|4
+LI|Liechtenstein|Vaduz|Europe|4
+LT|Lithuania|Vilnius|Europe|4
+LU|Luxembourg|Luxembourg|Europe|4
+MG|Madagascar|Antananarivo|Africa|4
+MW|Malawi|Lilongwe|Africa|5
+MY|Malaysia|Kuala Lumpur|Asia|3
+MV|Maldives|Malé|Asia|4
+ML|Mali|Bamako|Africa|5
+MT|Malta|Valletta|Europe|3
+MH|Marshall Islands|Majuro|Oceania|5
+MR|Mauritania|Nouakchott|Africa|5
+MU|Mauritius|Port Louis|Africa|4
+MX|Mexico|Mexico City|North America|1
+FM|Micronesia|Palikir|Oceania|5
+MD|Moldova|Chișinău|Europe|5
+MC|Monaco|Monaco|Europe|4
+MN|Mongolia|Ulaanbaatar|Asia|3
+ME|Montenegro|Podgorica|Europe|4
+MA|Morocco|Rabat|Africa|2
+MZ|Mozambique|Maputo|Africa|4
+MM|Myanmar|Naypyidaw|Asia|4
+NA|Namibia|Windhoek|Africa|4
+NR|Nauru|Yaren|Oceania|5
+NP|Nepal|Kathmandu|Asia|2
+NL|Netherlands|Amsterdam|Europe|2
+NZ|New Zealand|Wellington|Oceania|2
+NI|Nicaragua|Managua|North America|5
+NE|Niger|Niamey|Africa|5
+NG|Nigeria|Abuja|Africa|3
+MK|North Macedonia|Skopje|Europe|4
+NO|Norway|Oslo|Europe|2
+OM|Oman|Muscat|Asia|5
+PK|Pakistan|Islamabad|Asia|3
+PW|Palau|Ngerulmud|Oceania|5
+PS|Palestine||Asia|4
+PA|Panama|Panama City|North America|3
+PG|Papua New Guinea|Port Moresby|Oceania|4
+PY|Paraguay|Asunción|South America|5
+PE|Peru|Lima|South America|3
+PH|Philippines|Manila|Asia|3
+PL|Poland|Warsaw|Europe|2
+PT|Portugal|Lisbon|Europe|2
+QA|Qatar|Doha|Asia|4
+RO|Romania|Bucharest|Europe|3
+RU|Russia|Moscow|Europe|2
+RW|Rwanda|Kigali|Africa|5
+KN|Saint Kitts and Nevis|Basseterre|North America|5
+LC|Saint Lucia|Castries|North America|5
+VC|Saint Vincent and the Grenadines|Kingstown|North America|5
+WS|Samoa|Apia|Oceania|5
+SM|San Marino|San Marino|Europe|5
+ST|São Tomé and Príncipe|São Tomé|Africa|5
+SA|Saudi Arabia|Riyadh|Asia|3
+SN|Senegal|Dakar|Africa|4
+RS|Serbia|Belgrade|Europe|4
+SC|Seychelles|Victoria|Africa|4
+SL|Sierra Leone|Freetown|Africa|5
+SG|Singapore|Singapore|Asia|3
+SK|Slovakia|Bratislava|Europe|4
+SI|Slovenia|Ljubljana|Europe|4
+SB|Solomon Islands|Honiara|Oceania|5
+SO|Somalia|Mogadishu|Africa|4
+ZA|South Africa|Pretoria|Africa|2
+SS|South Sudan|Juba|Africa|5
+ES|Spain|Madrid|Europe|1
+LK|Sri Lanka|Colombo|Asia|3
+SD|Sudan|Khartoum|Africa|5
+SR|Suriname|Paramaribo|South America|5
+SE|Sweden|Stockholm|Europe|1
+CH|Switzerland|Bern|Europe|1
+SY|Syria|Damascus|Asia|4
+TW|Taiwan|Taipei|Asia|3
+TJ|Tajikistan|Dushanbe|Asia|5
+TZ|Tanzania|Dodoma|Africa|4
+TH|Thailand|Bangkok|Asia|2
+TL|Timor-Leste|Dili|Asia|5
+TG|Togo|Lomé|Africa|5
+TO|Tonga|Nukuʻalofa|Oceania|5
+TT|Trinidad and Tobago|Port of Spain|North America|4
+TN|Tunisia|Tunis|Africa|3
+TR|Turkey|Ankara|Asia|2
+TM|Turkmenistan|Ashgabat|Asia|5
+TV|Tuvalu|Funafuti|Oceania|5
+UG|Uganda|Kampala|Africa|4
+UA|Ukraine|Kyiv|Europe|2
+AE|United Arab Emirates|Abu Dhabi|Asia|3
+GB|United Kingdom|London|Europe|1
+US|United States|Washington, D.C.|North America|1
+UY|Uruguay|Montevideo|South America|4
+UZ|Uzbekistan|Tashkent|Asia|5
+VU|Vanuatu|Port Vila|Oceania|5
+VA|Vatican City|Vatican City|Europe|4
+VE|Venezuela|Caracas|South America|3
+VN|Vietnam|Hanoi|Asia|2
+YE|Yemen|Sanaa|Asia|5
+ZM|Zambia|Lusaka|Africa|5
+ZW|Zimbabwe|Harare|Africa|4

@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geo Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Calm look: deep sea with a chart graticule, paper cards for flags, sun-yellow accent */
+  --bg: #0e2a47;
+  --panel: rgba(9, 29, 51, 0.55);
+  --line: rgba(159, 182, 205, 0.18);
+  --paper: #f3f6f9;
+  --ink: #e8f0f8;
+  --ink-soft: #9fb6cd;
+  --ink-dark: #10243a;
+  --sun: #ffc94a;
+  --sun-edge: #c9952a;
+  --good: #3ccf8e;
+  --bad: #ff7a6b;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --radius: 16px;
+  --land: #3f7fc6;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(80, 150, 210, 0.22), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(150, 196, 235, 0.09) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(90deg, rgba(150, 196, 235, 0.09) 0 1px, transparent 1px 64px);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.5;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 48px; display: flex; flex-direction: column; gap: 24px; }
+
+/* ---------- flags ---------- */
+img.flag { display: block; height: auto; }
+img.flag { aspect-ratio: 4 / 3; border-radius: 5px; box-shadow: 0 0 0 1px rgba(16, 36, 58, 0.14), 0 5px 12px rgba(16, 36, 58, 0.2); }
+
+/* ---------- header ---------- */
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { flex: none; }
+.brand h1 { font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: -0.01em; margin: 0; line-height: 1; }
+.brand .sub { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }
+.top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ghost { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px; font-size: 15px; color: var(--ink-soft); }
+.ghost:hover { color: var(--ink); border-color: var(--ink-soft); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; border-radius: 999px; padding: 5px 13px; font-size: 14px; color: var(--ink-soft); }
+.seg button[aria-pressed="true"] { background: var(--sun); color: var(--ink-dark); font-weight: 700; }
+
+/* ---------- menu ---------- */
+.games { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.game { padding: 16px 14px; }
+.game h2 { font-size: 19px !important; }
+.game p { font-size: 13.5px !important; }
+svg.shape { display: block; width: 86%; height: auto; aspect-ratio: 1; fill: var(--land); }
+.bigshape { padding: 18px 24px; }
+.bigshape svg.shape { width: 280px; max-width: 64vw; }
+.tile .imgbox svg.shape { width: 68%; }
+.name-btn svg.shape.mini { width: 44px; margin-left: auto; display: none; }
+.name-btn.revealed svg.shape.mini { display: block; }
+.review .card svg.shape.mini { width: 64px; }
+.credits { margin: 0; font-size: 12.5px; color: var(--ink-soft); text-align: center; }
+body[data-look="playful"] .credits { color: #eaf6ff; }
+.game:not([disabled]):not(.active):hover { transform: translateY(-2px); }
+.game { transition: transform 0.12s; }
+details.opts { border-top: 1px solid var(--line); padding-top: 14px; }
+details.opts summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 15px; color: var(--ink-soft); }
+details.opts summary::-webkit-details-marker { display: none; }
+details.opts summary .cur { color: var(--ink); font-weight: 700; }
+details.opts summary .change { margin-left: auto; border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: 14px; }
+details.opts[open] summary .change { background: var(--sun); color: var(--ink-dark); border-color: var(--sun); }
+details.opts summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; border-radius: 8px; }
+.opts-body { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+.opts-body .chip { padding: 5px 12px; font-size: 14px; }
+.opts-body .label { font-size: 12px; }
+.qflag { width: 84px; margin-bottom: 6px; }
+.name-btn .txt { display: flex; flex-direction: column; gap: 1px; }
+.name-btn .sub-nm { display: none; font-weight: 400; font-size: 14px; color: #4a6078; }
+.name-btn.revealed .sub-nm { display: block; }
+body[data-look="playful"] details.opts summary .change { background: #fff; border-color: #d5e6f5; }
+body[data-look="playful"] details.opts[open] summary .change { background: var(--sun); border-color: var(--sun-edge); }
+.game { text-align: left; border-radius: var(--radius); padding: 18px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.game h2 { font-family: var(--display); font-size: 21px; margin: 0; font-weight: 700; }
+.game p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+.game.active { background: var(--paper); color: var(--ink-dark); border-color: var(--paper); box-shadow: 0 0 0 3px var(--sun), 0 14px 30px rgba(0, 0, 0, 0.3); }
+.game.active p { color: #4a6078; }
+.game .tag { align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; background: rgba(159, 182, 205, 0.16); color: var(--ink-soft); }
+.game.active .tag { background: var(--sun); color: var(--ink-dark); }
+.game[disabled] { cursor: default; opacity: 0.7; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 18px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 7px 15px; font-size: 15px; }
+.chip:hover { border-color: var(--ink-soft); }
+.chip[aria-pressed="true"] { background: var(--sun); color: var(--ink-dark); border-color: var(--sun); font-weight: 700; }
+.chip small { opacity: 0.7; font-weight: 400; }
+.start-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.primary { background: var(--sun); color: var(--ink-dark); border: 0; border-radius: 999px; padding: 13px 28px; font-family: var(--display); font-weight: 700; font-size: 18px; box-shadow: 0 6px 0 var(--sun-edge); transition: transform 0.08s, box-shadow 0.08s; }
+.primary:hover { transform: translateY(-1px); box-shadow: 0 7px 0 var(--sun-edge); }
+.primary:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--sun-edge); }
+.progress-note { color: var(--ink-soft); font-size: 15px; }
+.progress-note b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.calm { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-soft); font-size: 15px; }
+.calm svg { flex: none; margin-top: 2px; }
+
+/* ---------- game ---------- */
+.hud { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.levels { display: flex; gap: 6px; align-items: center; }
+.levels .lv { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 14px; border: 2px solid var(--line); color: var(--ink-soft); }
+.levels .lv.done { background: rgba(60, 207, 142, 0.18); border-color: var(--good); color: var(--good); }
+.levels .lv.now { background: var(--sun); border-color: var(--sun); color: var(--ink-dark); }
+.levels .cap { margin-right: 6px; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(159, 182, 205, 0.25); }
+.dots i.ok { background: var(--good); }
+.dots i.no { background: var(--bad); }
+.dots i.cur { background: transparent; box-shadow: inset 0 0 0 2px var(--sun); }
+
+.stage { display: flex; flex-direction: column; gap: 22px; }
+.question { text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.question .ask { color: var(--ink-soft); font-size: 16px; }
+.question .country { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 6vw, 50px); line-height: 1.05; letter-spacing: -0.015em; text-wrap: balance; }
+.question .hint { color: var(--ink-soft); font-size: 14px; }
+.bigflag { align-self: center; background: var(--paper); border-radius: 18px; padding: 26px 34px; box-shadow: 0 16px 34px rgba(0, 0, 0, 0.32); }
+.bigflag img.flag { width: 270px; max-width: 62vw; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tile { position: relative; background: var(--paper); border: 0; border-radius: var(--radius); padding: 16px 12px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28); transition: transform 0.12s, box-shadow 0.12s, opacity 0.2s; color: var(--ink-dark); }
+.tile:not([disabled]):hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.34); }
+.tile .imgbox { width: 100%; aspect-ratio: 4 / 3; display: grid; place-items: center; }
+.tile img.flag { width: 82%; }
+.tile .key { position: absolute; top: 8px; left: 10px; font-size: 12px; font-weight: 700; color: #8a9bb0; font-variant-numeric: tabular-nums; }
+.tile .nm { font-size: 14.5px; font-weight: 700; text-align: center; line-height: 1.25; text-wrap: balance; display: none; }
+.tile.revealed .nm { display: block; }
+.tile[disabled] { cursor: default; }
+.tile.dim { opacity: 0.78; }
+.tile.right { box-shadow: 0 0 0 4px var(--good), 0 10px 22px rgba(0, 0, 0, 0.3); opacity: 1; }
+.tile.wrong { box-shadow: 0 0 0 4px var(--bad), 0 10px 22px rgba(0, 0, 0, 0.3); opacity: 1; }
+.badge { position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; }
+.right .badge { background: var(--good); }
+.wrong .badge { background: var(--bad); }
+
+.names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.name-btn { position: relative; background: var(--paper); color: var(--ink-dark); border: 0; border-radius: 14px; padding: 14px 16px; font-weight: 700; font-size: 17px; text-align: left; display: flex; gap: 12px; align-items: center; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25); min-height: 58px; transition: transform 0.12s, opacity 0.2s; }
+.name-btn .key { font-size: 12px; color: #8a9bb0; font-variant-numeric: tabular-nums; }
+.name-btn:not([disabled]):hover { transform: translateY(-2px); }
+.name-btn[disabled] { cursor: default; }
+.name-btn.dim { opacity: 0.78; }
+.name-btn.right { box-shadow: 0 0 0 4px var(--good); opacity: 1; }
+.name-btn.wrong { box-shadow: 0 0 0 4px var(--bad); opacity: 1; }
+.name-btn img.flag { width: 45px; margin-left: auto; display: none; }
+.name-btn.revealed img.flag { display: block; }
+
+.feedback { min-height: 92px; border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 18px; justify-content: space-between; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); }
+.feedback .msg { display: flex; flex-direction: column; gap: 2px; }
+.feedback .verdict { font-family: var(--display); font-weight: 700; font-size: 21px; display: flex; align-items: center; gap: 8px; }
+.feedback .verdict.ok { color: var(--good); }
+.feedback .verdict.no { color: var(--bad); }
+.feedback .facts { color: var(--ink-soft); font-size: 15px; }
+.feedback .facts b { color: var(--ink); }
+.feedback .idle { color: var(--ink-soft); font-size: 15px; }
+.quick { font-family: var(--body); font-size: 13px; font-weight: 700; color: var(--ink-dark); background: var(--sun); padding: 2px 9px 2px 6px; border-radius: 999px; display: inline-flex; gap: 3px; align-items: center; }
+.kbd { display: inline-block; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; font-size: 13px; line-height: 1.5; }
+
+/* ---------- summary ---------- */
+.summary { text-align: center; align-items: center; }
+.summary h2 { font-family: var(--display); font-size: 36px; margin: 0; font-weight: 800; }
+.stars { display: flex; gap: 6px; justify-content: center; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 620px; }
+.stat { border: 1px solid var(--line); border-radius: 14px; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-family: var(--display); font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat span { font-size: 13.5px; color: var(--ink-soft); }
+.pb { font-size: 15px; color: var(--ink-soft); }
+.pb.new { color: var(--sun); font-weight: 700; }
+.review { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; text-align: center; }
+.review .card { width: 148px; background: var(--paper); color: var(--ink-dark); border-radius: 12px; padding: 14px 8px 10px; display: flex; flex-direction: column; gap: 7px; align-items: center; font-size: 14px; font-weight: 700; line-height: 1.25; }
+.review .card img.flag { width: 84px; }
+.review .card span { font-weight: 400; color: #4a6078; font-size: 13px; }
+.btn-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+.bar-wrap { display: flex; flex-direction: column; gap: 6px; min-width: 240px; flex: 1; max-width: 420px; }
+.bar { height: 12px; border-radius: 999px; background: rgba(159, 182, 205, 0.22); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--good); border-radius: 999px; transition: width 0.3s; }
+.bar-text { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.bar-text b { color: var(--ink); }
+.again-note { color: var(--sun); font-weight: 700; font-size: 14px; }
+body[data-look="playful"] .bar { background: rgba(255, 255, 255, 0.6); height: 16px; }
+body[data-look="playful"] .bar-text, body[data-look="playful"] .bar-text b { color: #fff; font-weight: 600; }
+body[data-look="playful"] .again-note { color: #fff; background: var(--bad); padding: 2px 12px; border-radius: 999px; }
+/* ---------- postcard: flag of the day ---------- */
+.postcard { border-radius: 14px; padding: 7px; background: repeating-linear-gradient(135deg, #d93b4f 0 14px, #fff 14px 22px, #2b62b8 22px 36px, #fff 36px 44px); box-shadow: 0 10px 24px rgba(16, 36, 58, 0.25); transform: rotate(-0.6deg); }
+.pc-inner { position: relative; background: #fffdf7; border-radius: 9px; padding: 18px 22px; display: flex; gap: 22px; align-items: center; color: #2c2a33; }
+.pc-flag img.flag { width: 150px; }
+.pc-body { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; flex: 1; min-width: 0; }
+.pc-eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #9a7b4f; }
+.pc-q { font-family: var(--display); font-size: 24px; font-weight: 700; }
+.pc-name { font-family: var(--display); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.pc-facts { color: #5d5866; font-size: 15px; }
+.pc-twin { display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: #5d5866; }
+.pc-twin img.flag { width: 34px; }
+.pc-practise { color: #2c2a33 !important; border-color: #d8cfbf !important; background: #fff !important; }
+.primary.small { padding: 8px 20px; font-size: 16px; box-shadow: 0 4px 0 var(--sun-edge); }
+.pc-stamp { position: absolute; top: 12px; right: 14px; width: 46px; transform: rotate(6deg); }
+
+/* ---------- passport ---------- */
+.passport { display: grid; grid-template-columns: 1fr 1fr; padding: 10px; border-radius: 20px; background: #6e1e3a; box-shadow: 0 16px 34px rgba(16, 36, 58, 0.3), inset 0 0 0 2px #8b2c4c; }
+.page { position: relative; padding: 22px 22px 18px; color: #3a2a30; display: flex; flex-direction: column; gap: 12px;
+  background-color: #fbf6ea;
+  background-image: repeating-radial-gradient(circle at 100% 0%, rgba(110, 30, 58, 0.045) 0 1px, transparent 1px 7px), repeating-radial-gradient(circle at 0% 100%, rgba(43, 98, 184, 0.04) 0 1px, transparent 1px 9px); }
+.page.left { border-radius: 12px 3px 3px 12px; box-shadow: inset -18px 0 22px -18px rgba(60, 30, 20, 0.35); }
+.page.right { border-radius: 3px 12px 12px 3px; box-shadow: inset 18px 0 22px -18px rgba(60, 30, 20, 0.35); }
+.pp-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #8a5b6b; border-bottom: 1px solid rgba(110, 30, 58, 0.18); padding-bottom: 8px; }
+.pp-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #8a5b6b; }
+.holder { display: flex; gap: 14px; align-items: center; }
+.photo { width: 76px; height: 92px; border-radius: 6px; background: #e6eef6; border: 1px solid #cdbfa8; display: grid; place-items: center; flex: none; }
+.photo svg { width: 54px; height: 54px; }
+.holder-txt { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+#holder-name { font: inherit; font-family: var(--display); font-size: 22px; font-weight: 600; color: #2c2a33; background: transparent; border: 0; border-bottom: 2px dotted #b9a68b; padding: 2px 0; width: 100%; }
+#holder-name:focus { outline: none; border-bottom-color: #6e1e3a; }
+#holder-name::placeholder { color: #b9a68b; }
+.pp-count { font-size: 14px; color: #6b5a60; }
+.pp-count b { color: #2c2a33; font-variant-numeric: tabular-nums; }
+.visas { display: flex; flex-direction: column; gap: 8px; }
+.visa { display: flex; align-items: center; gap: 12px; text-align: left; background: rgba(255, 255, 255, 0.7); border: 1.5px solid #e2d6c2; border-radius: 12px; padding: 9px 12px; color: #2c2a33; transition: transform 0.12s; }
+.visa:not(.soon):hover { transform: translateX(3px); }
+.visa.active { border-color: var(--ink); background: #fff; box-shadow: 0 0 0 2px var(--ink); }
+.visa-ico { width: 34px; height: 34px; flex: none; color: var(--ink); }
+.visa-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
+.visa-txt b { font-family: var(--display); font-size: 17px; }
+.visa-txt span { font-size: 12.5px; color: #6b5a60; }
+.visa-prog { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-size: 12px; color: #6b5a60; font-variant-numeric: tabular-nums; flex: none; }
+.vbar { width: 64px; height: 6px; border-radius: 99px; background: #eadfcd; overflow: hidden; }
+.vbar i { display: block; height: 100%; background: var(--ink); }
+.visa.soon { opacity: 0.55; border-style: dashed; padding: 6px 12px; }
+.mrz { margin-top: auto; font-family: "Courier New", ui-monospace, monospace; font-size: 12.5px; letter-spacing: 0.08em; color: #8a7a6a; white-space: nowrap; overflow: hidden; }
+.stamps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; justify-items: center; align-items: center; flex: 1; align-content: center; }
+.stamp { border: 0; background: transparent; padding: 0; width: 100%; max-width: 116px; color: #a89c8c; transform: rotate(var(--rot)); transition: transform 0.15s; }
+.stamp svg { width: 100%; height: auto; display: block; }
+.stamp.earned { color: var(--ink); mix-blend-mode: multiply; }
+.stamp:not(.earned) svg circle:nth-of-type(2) { color: var(--ink); }
+.stamp:hover { transform: rotate(0deg) scale(1.06); }
+.stamp.world { grid-column: 2; }
+.pp-hint { margin: 0; font-size: 13px; color: #6b5a60; text-align: center; }
+@media (max-width: 760px) {
+  .passport { grid-template-columns: 1fr; }
+  .page.left, .page.right { border-radius: 12px; box-shadow: none; }
+  .page.left { margin-bottom: 8px; }
+  .pc-inner { flex-direction: column; align-items: flex-start; }
+}
+/* ---------- home ---------- */
+.home-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+.hero-text { flex: 1 1 330px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.hero-title { margin: 0; font-family: var(--display); font-size: clamp(40px, 6vw, 60px); line-height: 1.02; font-weight: 700; text-wrap: balance; }
+.hero-sub { margin: 0; font-size: 19px; color: var(--ink-soft); max-width: 34ch; }
+.mixes { display: flex; flex-wrap: wrap; gap: 8px; }
+.mix { display: inline-flex; align-items: center; gap: 7px; background: var(--paper); color: var(--ink-dark); border-radius: 999px; padding: 6px 14px 6px 10px; font-weight: 600; font-size: 15px; box-shadow: inset 0 0 0 2px var(--ink); }
+.mix svg { width: 20px; height: 20px; color: var(--ink); }
+.hero-cta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+.primary.big { font-size: 24px; padding: 16px 38px; box-shadow: 0 7px 0 var(--sun-edge); }
+.hero-note { font-size: 15px; color: var(--ink-soft); max-width: 26ch; }
+.hero-globe { min-width: 0; flex: 0 1 420px; display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 auto; }
+#globe { width: 100%; max-width: 420px; aspect-ratio: 1; cursor: grab; touch-action: none; display: block; filter: drop-shadow(0 14px 18px rgba(19, 49, 92, 0.25)); }
+#globe:active { cursor: grabbing; }
+.globe-hint { font-size: 13px; color: var(--ink-soft); }
+.gcards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.gcard { text-align: left; border: 0; background: var(--paper); color: var(--ink-dark); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 7px; box-shadow: 0 6px 0 var(--ink); transition: transform 0.12s; font: inherit; }
+.gcard:not(.soon):hover { transform: translateY(-3px); }
+.gcard .gname { font-family: var(--display); font-size: 21px; font-weight: 700; }
+.gcard .gdesc { font-size: 13.5px; color: #4b6584; line-height: 1.35; flex: 1; }
+.gcard .vbar { width: 100%; }
+.gcard .gprog { font-size: 13px; color: #4b6584; font-variant-numeric: tabular-nums; }
+.gcard.soon { background: transparent; box-shadow: none; border: 2px dashed var(--line); color: var(--ink-soft); }
+.gcard.soon .gdesc { color: var(--ink-soft); }
+.setup-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+.setup-title { margin: 0; font-family: var(--display); font-size: 36px; font-weight: 700; }
+.setup-desc { color: var(--ink-soft); font-size: 16px; }
+body[data-look="playful"] .stamps-link { font-weight: 600; }
+@media (max-width: 860px) { .gcards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .gcards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* ---------- flag of the day (compact) ---------- */
+.fotd-mini { width: 100%; max-width: 440px; display: flex; align-items: center; gap: 12px; background: #fffdf7; color: #2c2a33; border-radius: 14px; padding: 10px 12px; box-shadow: 0 0 0 3px rgba(200, 50, 75, 0.25), 0 5px 0 rgba(42, 127, 192, 0.3); }
+.fotd-mini img.flag { width: 58px; flex: none; }
+.fm-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
+.fm-eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #9a7b4f; }
+.fm-main { font-family: var(--display); font-size: 17px; font-weight: 700; }
+.fm-sub { font-size: 13px; color: #5d5866; }
+.fotd-mini .pc-practise { padding: 6px 12px; font-size: 14px; flex: none; }
+.fotd-mini.pulse { animation: boing 0.5s ease-out; }
+.linkish { background: none; border: 0; padding: 4px 2px; font-size: 16px; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+.linkish:hover { color: var(--ink); }
+/* ---------- passport spreads ---------- */
+.pp-wrap { display: flex; flex-direction: column; gap: 10px; }
+.pp-tabs { display: flex; gap: 6px; padding-left: 18px; flex-wrap: wrap; }
+.pp-tab { border: 0; border-radius: 10px 10px 0 0; padding: 8px 16px 6px; font-size: 14px; font-weight: 600; background: rgba(110, 30, 58, 0.35); color: #fff; margin-bottom: -10px; }
+.pp-tab.on { background: #6e1e3a; }
+.pp-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.pp-nav button[disabled] { opacity: 0.35; cursor: default; }
+.pp-game { color: var(--ink); }
+.pp-sub { font-size: 13px; color: #6b5a60; }
+.pp-empty { flex: 1; display: grid; place-items: center; align-content: center; gap: 8px; color: #b9a68b; min-height: 300px; font-size: 15px; }
+.pp-empty svg { width: 120px; height: 120px; }
+/* ---------- cities map ---------- */
+.city-q { gap: 2px; }
+.city-hint { display: inline-flex; align-items: center; gap: 8px; font-size: 16px !important; }
+img.flag.tiny { width: 28px; }
+.mapbox { border-radius: var(--radius); overflow: hidden; background: #5ab8ec; box-shadow: 0 7px 0 rgba(42, 127, 192, 0.45); display: flex; justify-content: center; }
+#citymap { display: block; width: 100%; height: auto; max-height: 54vh; cursor: crosshair; touch-action: manipulation; }
+#citymap .sea { fill: #5ab8ec; }
+#citymap .land { fill: #a6e3bf; stroke: #fff; stroke-width: 0.9; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+#citymap .land.home-country { fill: #ffe08a; }
+#citymap .miss-line { stroke: #13315c; fill: none; stroke-linecap: round; }
+#citymap .pick circle { fill: #ff5d73; stroke: #fff; }
+#citymap .pick.ok circle { fill: #ffd23f; }
+#citymap .truth { fill: #22b573; stroke: #fff; }
+#citymap .truth-label { fill: #13315c; stroke: #fff; paint-order: stroke; text-anchor: middle; font-family: var(--display); font-weight: 700; }
+body[data-look="calm"] .mapbox, body[data-look="calm"] #citymap .sea { background: #1d4a73; fill: #1d4a73; }
+body[data-look="calm"] #citymap .land { fill: #7fb7a0; stroke: #1d4a73; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+
+/* =================== PLAYFUL LOOK =================== */
+body[data-look="playful"] {
+  --bg: #6cc8f5;
+  --panel: rgba(255, 255, 255, 0.82);
+  --line: rgba(19, 49, 92, 0.16);
+  --paper: #ffffff;
+  --ink: #13315c;
+  --ink-soft: #3d6496;
+  --ink-dark: #13315c;
+  --sun: #ffd23f;
+  --sun-edge: #e0a100;
+  --good: #22b573;
+  --bad: #ff5d73;
+  --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --radius: 22px;
+  --land: #2fae74;
+  color-scheme: light;
+  background-image:
+    radial-gradient(ellipse 160px 60px at 12% 14%, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(ellipse 120px 46px at 18% 18%, rgba(255, 255, 255, 0.8), transparent 70%),
+    radial-gradient(ellipse 200px 70px at 86% 9%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(ellipse 140px 50px at 78% 70%, rgba(255, 255, 255, 0.55), transparent 70%),
+    linear-gradient(180deg, #8fdcff 0%, #59b9f0 55%, #3f9fe0 100%);
+  background-attachment: fixed;
+}
+body[data-look="playful"] .brand h1 { font-weight: 700; font-size: 32px; color: #fff; text-shadow: 0 3px 0 #2a7fc0; letter-spacing: 0; }
+body[data-look="playful"] .brand .sub { color: #fff; font-weight: 500; }
+body[data-look="playful"] .ghost { background: rgba(255, 255, 255, 0.7); color: var(--ink); border-color: transparent; font-weight: 500; }
+body[data-look="playful"] .seg { background: rgba(255, 255, 255, 0.7); border-color: transparent; }
+body[data-look="playful"] .seg button { color: var(--ink-soft); font-weight: 500; }
+body[data-look="playful"] .label { letter-spacing: 0.04em; font-weight: 600; }
+body[data-look="playful"] .game { background: rgba(255, 255, 255, 0.5); border: 0; }
+body[data-look="playful"] .game.active { background: #fff; }
+body[data-look="playful"] .game[disabled] { opacity: 0.55; }
+body[data-look="playful"] .game.active { box-shadow: 0 0 0 4px var(--sun), 0 8px 0 #2a7fc0; transform: rotate(-1deg); }
+body[data-look="playful"] .game h2 { font-weight: 600; font-size: 24px; }
+body[data-look="playful"] .panel, body[data-look="playful"] .feedback { border: 0; box-shadow: 0 8px 0 rgba(42, 127, 192, 0.45); }
+body[data-look="playful"] .chip { background: #fff; border: 2px solid #d5e6f5; font-weight: 500; }
+body[data-look="playful"] .chip[aria-pressed="true"] { border-color: var(--sun-edge); box-shadow: 0 3px 0 var(--sun-edge); }
+body[data-look="playful"] .primary { font-weight: 600; font-size: 20px; padding: 13px 30px; }
+body[data-look="playful"] .question .ask { color: #fff; font-size: 18px; font-weight: 500; }
+body[data-look="playful"] .question .country { color: #fff; font-weight: 700; text-shadow: 0 4px 0 #2a7fc0; letter-spacing: 0; }
+body[data-look="playful"] .question .hint { color: #eaf6ff; }
+body[data-look="playful"] .tile, body[data-look="playful"] .name-btn { box-shadow: 0 7px 0 #2a7fc0; font-weight: 600; }
+body[data-look="playful"] .tile:not([disabled]):hover { transform: translateY(-4px) rotate(-1.2deg); box-shadow: 0 11px 0 #2a7fc0; }
+body[data-look="playful"] .tile:nth-child(even):not([disabled]):hover { transform: translateY(-4px) rotate(1.2deg); }
+body[data-look="playful"] .tile.right, body[data-look="playful"] .name-btn.right { box-shadow: 0 0 0 5px var(--good), 0 7px 0 #168a56; animation: boing 0.5s ease-out; }
+body[data-look="playful"] .tile.wrong, body[data-look="playful"] .name-btn.wrong { box-shadow: 0 0 0 5px var(--bad), 0 7px 0 #c93a4f; animation: wobble 0.45s ease-in-out; }
+body[data-look="playful"] .bigflag { box-shadow: 0 8px 0 #2a7fc0; transform: rotate(-1.5deg); }
+body[data-look="playful"] .levels .cap { color: #fff; }
+body[data-look="playful"] .levels .lv { background: rgba(255, 255, 255, 0.6); border-color: transparent; color: var(--ink-soft); }
+body[data-look="playful"] .levels .lv.now { background: var(--sun); box-shadow: 0 3px 0 var(--sun-edge); color: var(--ink); }
+body[data-look="playful"] .levels .lv.done { background: var(--good); color: #fff; }
+body[data-look="playful"] .dots i { width: 13px; height: 13px; background: rgba(255, 255, 255, 0.6); }
+body[data-look="playful"] .dots i.ok { background: var(--good); }
+body[data-look="playful"] .dots i.no { background: var(--bad); }
+body[data-look="playful"] .pb.new { color: #a35f00; }
+body[data-look="playful"] .dots i.cur { background: #fff; box-shadow: inset 0 0 0 3px var(--sun-edge); }
+body[data-look="playful"] .stat { background: #f2f9ff; border: 0; }
+body[data-look="playful"] .review .card { box-shadow: 0 5px 0 #c9def0; }
+body[data-look="playful"] .summary h2 { font-weight: 700; }
+@keyframes boing { 0% { transform: scale(1); } 35% { transform: scale(1.08) rotate(-2deg); } 65% { transform: scale(0.97) rotate(1deg); } 100% { transform: scale(1); } }
+@keyframes wobble { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px) rotate(-2deg); } 40% { transform: translateX(6px) rotate(2deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+
+@media (max-width: 860px) { .games { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 620px) { .games { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) {
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .names { grid-template-columns: 1fr; }
+  .tile { padding: 12px 8px 10px; }
+  .wrap { padding: 18px 16px 36px; gap: 18px; }
+  .stats { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+@keyframes pop { from { transform: scale(0.97); opacity: 0.5; } to { transform: none; opacity: 1; } }
+.enter { animation: pop 0.22s ease-out; }
+</style>
+</head>
+<body data-look="playful">
+<div class="wrap" id="app"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script id="flag-data" type="application/json">__DATA__</script>
+<script id="shape-data" type="application/json">__SHAPES__</script>
+<script id="world-data" type="application/json">__WORLD__</script>
+<script id="city-data" type="application/json">__CITIES__</script>
+<script>
+(function () {
+  // Flags: flag-icons by Panayiotis Lipiridis and contributors (MIT licence), embedded as SVG.
+  const FLAGS = JSON.parse(document.getElementById('flag-data').textContent);
+  const BY = Object.fromEntries(FLAGS.map(f => [f.c, f]));
+  const SRC = {};
+  for (const f of FLAGS) SRC[f.c] = URL.createObjectURL(new Blob([f.svg], { type: 'image/svg+xml' }));
+  // Outlines: mledoze/countries (ODbL), from Natural Earth; projected and simplified for this game.
+  const SHAPES = JSON.parse(document.getElementById('shape-data').textContent);
+  // Capitals game: independent countries with an agreed capital
+  const CAPITAL_SET = FLAGS.filter(f => !f.x && f.cap);
+  const SHAPE_SET = FLAGS.filter(f => SHAPES.paths[f.c]);
+  // Cities: Natural Earth populated places (public domain); each city gets its own key in BY
+  const CITY_SET = JSON.parse(document.getElementById('city-data').textContent).map(x => ({ c: x.id, n: x.n, ni: x.ni, cap: '', capi: '', r: x.r, t: x.t, cc: x.cc, lat: x.lat, lon: x.lon, isCap: !!x.cap }));
+  for (const x of CITY_SET) BY[x.c] = x;
+  const shape = (c, cls) => `<svg class="shape ${cls || ''}" viewBox="0 0 100 100" aria-hidden="true"><path d="${SHAPES.paths[c]}" fill-rule="evenodd"/></svg>`;
+
+  const REGIONS = ['World', 'Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
+  const PER_LEVEL = 10, LEVELS = 5, AUTO_NEXT_MS = 650, QUICK_MS = 3000;
+  const app = document.getElementById('app');
+  const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- words ----------
+  const T = {
+    en: {
+      tagline: 'Take your time. Learn the world.', menu: 'Menu', coming: 'Coming soon',
+      flags: 'Flags', flagsDesc: 'Spot the right flag among six, from the famous to the fiendish.',
+      capitals: 'Capitals', capitalsDesc: 'From Rome to Ouagadougou: match each country to its capital.',
+      shapes: 'Shapes', shapesDesc: 'Recognise a country from its outline alone.',
+      pageN: n => `page ${n}`, contents: 'Contents', stampsOn: (n, N) => `${n} of ${N} stamps on this page`, prevPage: 'Previous page', nextPage: 'Next page', spreadN: (a, b) => `${a} / ${b}`,
+      pinHint: 'Tap the ? on the globe, or reveal it here.', nextUp: (g, r) => `Next: ${g} · ${r}`, replayTour: "Replay today's tour", tourDoneHero: 'Tour done for today!',
+      tourDoneSub: n => `You got ${n}/10. A new tour arrives tomorrow. Where next?`, otherGame: 'Pick another game',
+      home: 'Home', myStamps: (n, N) => `My stamps · ${n} of ${N}`, stampsTitle: 'My stamps',
+      tourTitle: "Today's world tour", tourSub: 'Ten questions, a little of everything. Take as long as you like.', tourLabel: "Today's tour",
+      mixN: (n, tp) => `${n} ${{ flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities' }[tp]}`,
+      playTour: "Play today's tour", tourAgain: 'Play the tour again', sameForAll: 'Same questions for everyone today', tourDoneNote: n => `Done today: ${n}/10. A new tour tomorrow.`,
+      tourDoneTitle: n => n === 10 ? 'A perfect tour!' : n >= 7 ? 'Lovely trip!' : 'Tour complete', tourRight: 'right today', tomorrow: 'Tomorrow', tomorrowNote: 'a brand-new tour', backHome: 'Back home',
+      globeLabel: 'A globe you can drag to spin', dragSpin: 'Drag to spin', orPlay: 'Or play one game', learnedN: (n, N) => `${n} of ${N} learned`,
+      legend: 'On the globe, countries you have got right in any game turn dark green.',
+      fotd: 'Flag of the day', whoseToday: 'Whose flag is this?', reveal: 'Reveal', mixUp: 'Easy to mix up with', practise: r => `Practise ${r}`,
+      passport: 'Passport', holder: 'Holder', namePh: 'Your name', stampsCount: (n, N) => `<b>${n}</b> of ${N} stamps`, chooseGame: 'Choose a game',
+      stampsFor: g => `Stamps · ${g}`, stampHint: 'Learn every one in a region to earn its stamp. Tap a stamp to practise that region.', learnedOf: (n, N) => `${n}/${N}`,
+      credits: 'Flags from flag-icons (MIT). Outlines from mledoze/countries (ODbL), based on Natural Earth. City locations from Natural Earth (public domain).',
+      cities: 'Cities', citiesDesc: 'Find cities on the map: get as close as you can.',
+      capitalOf: c => `Capital of ${c}`, cityIn: c => `A city in ${c}`, kmAway: k => `${k.toLocaleString('en-GB')} km away`, bullseye: 'Bullseye!', closeEnough: 'Close enough!',
+      within: k => `Within ${k} km counts as right`, mapLabel: r => `Map of ${r}: click where you think the city is`,
+      landmarks: 'Landmarks', landmarksDesc: 'Find the Eiffel Tower, Machu Picchu and friends on the map.',
+      noun: { flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities' }, Noun: { flags: 'Flags', capitals: 'Capitals', shapes: 'Shapes', cities: 'Cities' },
+      howTo: 'How to play', levelsMode: 'Five levels', allMode: { flags: 'Every flag, until you know them all', capitals: 'Every capital, until you know them all', shapes: 'Every shape, until you know them all', cities: 'Every city, until you know them all' },
+      options: 'Options', change: 'Change',
+      qStyle: 'Question style', styles: { flags: { find: 'Pick the flag', name: 'Name the flag' }, capitals: { find: 'Pick the capital', name: 'Name the country' }, shapes: { find: 'Pick the shape', name: 'Name the country' }, cities: { find: 'Find it on the map', name: 'Find it on the map' } },
+      region: 'Region', theme: 'Theme', playful: 'Playful', calm: 'Calm night',
+      regions: { World: 'World', Europe: 'Europe', Asia: 'Asia', Africa: 'Africa', 'North America': 'North America', 'South America': 'South America', Oceania: 'Oceania' },
+      noteLevels: noun => `No clock on screen, no rush. Five levels of ${PER_LEVEL} ${noun}, getting gradually harder. Get one wrong and you'll see what every option was. At the end of each level you'll see how quick you were, if you're curious.`,
+      noteAll: (n, noun) => `All ${n} ${noun}, easiest first. Any you get wrong come back at the end until you've got every one right. Your place is saved in this browser, so you can stop and carry on another day.`,
+      startLevels: 'Start level 1', startAll: 'Start', resume: (d, n) => `Carry on (${d} of ${n} done)`, restart: 'Start over',
+      learned: (Noun, n, N) => `${Noun} you've got right so far: <b>${n}</b> of ${N}`,
+      level: 'Level', only: r => `${r} only`,
+      ask: { flags: { find: 'Which flag belongs to', name: 'Whose flag is this?' }, capitals: { find: 'What is the capital of', name: 'Which country has this capital?' }, shapes: { find: 'Which shape is', name: 'Which country is this?' }, cities: { find: 'Where is', name: 'Where is' } },
+      idle: 'Take your time. You can also press <span class="kbd">1</span>–<span class="kbd">6</span> to choose.',
+      correct: ['Correct!', 'Spot on!', 'Well done!', 'Yes, that’s it!'], quick: 'Quick!', capital: 'capital',
+      pickedFlag: n => `That one is ${n}`, notQuite: (n, tp) => tp === 'flags' ? `Not quite. This is the flag of ${n}` : `Not quite. This is ${n}`,
+      capWrong: (cap, ctry) => `${cap} is the capital of ${ctry}`,
+      next: 'Next', results: 'See results',
+      perfect: 'A perfect round!', great: 'Great work!', nice: 'Nicely done', practice: 'Good practice',
+      rightOn: l => `right on level ${l}`, avg: 'average per right answer', quickest: n => `quickest: ${n}`, quickestBare: 'quickest',
+      pbNew: (n, a) => `New personal best for this level! (was ${n}/10, ${a} average)`, pbFirst: 'Your first score on this level is saved as your best.',
+      pbOld: (n, a) => `Your best on this level: ${n}/10, ${a} average`, quickCount: n => `${n} quick answer${n > 1 ? 's' : ''} under 3 s`,
+      review: 'To look at again', youPicked: n => `you picked ${n}`,
+      nextLevel: n => `Go to level ${n}`, replay: n => `Replay level ${n}`, again: 'Play again from level 1',
+      progress: (d, n) => `<b>${d}</b> of ${n} learned`, toGo: n => `${n} to go`, backAgain: 'Back again: this one caught you out earlier',
+      allDone: (n, noun) => `You know all ${n} ${noun}!`, firstTry: 'right first time', answers: 'answers in total', trickiest: 'took the most tries',
+      tries: k => `${k} tries`, playAgain: 'Play again', none: 'none'
+    },
+    it: {
+      tagline: 'Con calma. Scopri il mondo.', menu: 'Menu', coming: 'In arrivo',
+      flags: 'Bandiere', flagsDesc: 'Trova la bandiera giusta tra sei, dalle più famose alle più difficili.',
+      capitals: 'Capitali', capitalsDesc: 'Da Roma a Ouagadougou: abbina ogni paese alla sua capitale.',
+      shapes: 'Sagome', shapesDesc: 'Riconosci un paese solo dalla sua sagoma.',
+      pageN: n => `pagina ${n}`, contents: 'Indice', stampsOn: (n, N) => `${n} timbri su ${N} in questa pagina`, prevPage: 'Pagina precedente', nextPage: 'Pagina successiva', spreadN: (a, b) => `${a} / ${b}`,
+      pinHint: 'Tocca il ? sul mappamondo, o scoprila qui.', nextUp: (g, r) => `Prossimo: ${g} · ${r}`, replayTour: 'Rifai il giro di oggi', tourDoneHero: 'Giro di oggi fatto!',
+      tourDoneSub: n => `Hai fatto ${n}/10. Domani arriva un giro nuovo. E adesso?`, otherGame: 'Scegli un altro gioco',
+      home: 'Home', myStamps: (n, N) => `I miei timbri · ${n} su ${N}`, stampsTitle: 'I miei timbri',
+      tourTitle: 'Il giro del mondo di oggi', tourSub: 'Dieci domande, un po\' di tutto. Prenditi tutto il tempo che vuoi.', tourLabel: 'Giro di oggi',
+      mixN: (n, tp) => `${n} ${{ flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città' }[tp]}`,
+      playTour: 'Gioca il giro di oggi', tourAgain: 'Rifai il giro', sameForAll: 'Oggi le stesse domande per tutti', tourDoneNote: n => `Fatto oggi: ${n}/10. Domani un giro nuovo.`,
+      tourDoneTitle: n => n === 10 ? 'Giro perfetto!' : n >= 7 ? 'Bel viaggio!' : 'Giro completato', tourRight: 'giuste oggi', tomorrow: 'Domani', tomorrowNote: 'un giro tutto nuovo', backHome: 'Torna alla home',
+      globeLabel: 'Un mappamondo da far girare', dragSpin: 'Trascina per girare', orPlay: 'Oppure scegli un gioco', learnedN: (n, N) => `${n} su ${N} imparate`,
+      legend: 'Sul mappamondo, i paesi che hai indovinato in qualsiasi gioco diventano verde scuro.',
+      fotd: 'Bandiera del giorno', whoseToday: 'Di chi è questa bandiera?', reveal: 'Scopri', mixUp: 'Facile da confondere con', practise: r => `Allenati: ${r}`,
+      passport: 'Passaporto', holder: 'Titolare', namePh: 'Il tuo nome', stampsCount: (n, N) => `<b>${n}</b> timbri su ${N}`, chooseGame: 'Scegli un gioco',
+      stampsFor: g => `Timbri · ${g}`, stampHint: 'Impara tutte le risposte di una regione per avere il suo timbro. Tocca un timbro per allenarti su quella regione.', learnedOf: (n, N) => `${n}/${N}`,
+      credits: 'Bandiere da flag-icons (MIT). Sagome da mledoze/countries (ODbL), basate su Natural Earth. Posizione delle città da Natural Earth (pubblico dominio).',
+      cities: 'Città', citiesDesc: 'Trova le città sulla mappa: avvicinati il più possibile.',
+      capitalOf: c => `Capitale: ${c}`, cityIn: c => `Una città in: ${c}`, kmAway: k => `A ${k.toLocaleString('it-IT')} km`, bullseye: 'Centro perfetto!', closeEnough: 'Ci sei quasi, vale!',
+      within: k => `Entro ${k} km è giusto`, mapLabel: r => `Mappa: ${r}. Clicca dove pensi che sia la città`,
+      landmarks: 'Monumenti', landmarksDesc: 'Trova sulla mappa la Torre Eiffel, Machu Picchu e tanti altri.',
+      noun: { flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città' }, Noun: { flags: 'Bandiere', capitals: 'Capitali', shapes: 'Sagome', cities: 'Città' },
+      howTo: 'Come giocare', levelsMode: 'Cinque livelli', allMode: { flags: 'Tutte le bandiere, finché non le sai tutte', capitals: 'Tutte le capitali, finché non le sai tutte', shapes: 'Tutte le sagome, finché non le sai tutte', cities: 'Tutte le città, finché non le sai tutte' },
+      options: 'Opzioni', change: 'Cambia',
+      qStyle: 'Tipo di domanda', styles: { flags: { find: 'Scegli la bandiera', name: 'Indovina il paese' }, capitals: { find: 'Scegli la capitale', name: 'Indovina il paese' }, shapes: { find: 'Scegli la sagoma', name: 'Indovina il paese' }, cities: { find: 'Trovala sulla mappa', name: 'Trovala sulla mappa' } },
+      region: 'Regione', theme: 'Tema', playful: 'Giocoso', calm: 'Notte calma',
+      regions: { World: 'Mondo', Europe: 'Europa', Asia: 'Asia', Africa: 'Africa', 'North America': 'Nord America', 'South America': 'Sud America', Oceania: 'Oceania' },
+      noteLevels: noun => `Nessun cronometro, nessuna fretta. Cinque livelli da ${PER_LEVEL} ${noun}, sempre un po' più difficili. Se sbagli, vedi a cosa corrispondevano tutte le risposte. Alla fine di ogni livello puoi vedere quanto sei stata veloce, se ti incuriosisce.`,
+      noteAll: (n, noun) => `Tutte le ${n} ${noun}, dalle più facili. Quelle che sbagli tornano alla fine, finché non le hai indovinate tutte. Il punto in cui sei viene salvato in questo browser, così puoi fermarti e continuare un altro giorno.`,
+      startLevels: 'Inizia il livello 1', startAll: 'Inizia', resume: (d, n) => `Continua (${d} su ${n} fatte)`, restart: 'Ricomincia',
+      learned: (Noun, n, N) => `${Noun} indovinate finora: <b>${n}</b> su ${N}`,
+      level: 'Livello', only: r => `Solo ${r}`,
+      ask: { flags: { find: 'Trova la bandiera', name: 'Di chi è questa bandiera?' }, capitals: { find: 'Qual è la capitale?', name: 'Di quale paese è la capitale?' }, shapes: { find: 'Trova la sagoma', name: 'Che paese è questo?' }, cities: { find: 'Dov\'è', name: 'Dov\'è' } },
+      idle: 'Prenditi il tuo tempo. Puoi anche premere <span class="kbd">1</span>–<span class="kbd">6</span> per scegliere.',
+      correct: ['Giusto!', 'Esatto!', 'Ottimo!', 'Perfetto!'], quick: 'Veloce!', capital: 'capitale',
+      pickedFlag: n => `Hai scelto: ${n}`, notQuite: n => `Non proprio: è ${n}`,
+      capWrong: (cap, ctry) => `${ctry} ha come capitale ${cap}`,
+      next: 'Prossima', results: 'Vedi i risultati',
+      perfect: 'Giro perfetto!', great: 'Ottimo lavoro!', nice: 'Ben fatto', practice: 'Buon allenamento',
+      rightOn: l => `giuste al livello ${l}`, avg: 'in media per risposta giusta', quickest: n => `la più veloce: ${n}`, quickestBare: 'la più veloce',
+      pbNew: (n, a) => `Nuovo record per questo livello! (prima: ${n}/10, ${a} in media)`, pbFirst: 'Primo punteggio su questo livello: salvato come record.',
+      pbOld: (n, a) => `Il tuo record su questo livello: ${n}/10, ${a} in media`, quickCount: n => `${n} rispost${n > 1 ? 'e' : 'a'} sotto i 3 s`,
+      review: 'Da ripassare', youPicked: n => `hai scelto ${n}`,
+      nextLevel: n => `Vai al livello ${n}`, replay: n => `Rigioca il livello ${n}`, again: 'Ricomincia dal livello 1',
+      progress: (d, n) => `<b>${d}</b> su ${n} imparate`, toGo: n => `ne mancano ${n}`, backAgain: 'Di nuovo questa: prima ti aveva ingannato',
+      allDone: (n, noun) => `Conosci tutte le ${n} ${noun}!`, firstTry: 'giuste al primo colpo', answers: 'risposte in tutto', trickiest: 'la più difficile',
+      tries: k => `${k} tentativi`, playAgain: 'Gioca ancora', none: 'nessuna'
+    }
+  };
+
+  // ---------- storage (this browser only) ----------
+  const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const drop = k => { try { localStorage.removeItem(k); } catch (e) {} };
+
+  const learned = { flags: new Set(load('geo-flags-learned', [])), capitals: new Set(load('geo-capitals-learned', [])), shapes: new Set(load('geo-shapes-learned', [])), cities: new Set(load('geo-cities-learned', [])) };
+  const s0 = load('geo-settings-v2', {});
+  const state = {
+    topic: ['flags', 'capitals', 'shapes', 'cities'].includes(s0.topic) ? s0.topic : 'flags',
+    region: REGIONS.includes(s0.region) ? s0.region : 'World',
+    modes: Object.assign({ flags: 'find', capitals: 'find', shapes: 'name', cities: 'find' }, s0.modes || (s0.mode ? { flags: s0.mode } : {})),
+    game: s0.game === 'levels' ? 'levels' : 'all',
+    look: s0.look === 'calm' ? 'calm' : 'playful',
+    lang: s0.lang === 'it' ? 'it' : (load('geo-flags-settings', {}).lang === 'it' ? 'it' : 'en'),
+    optsOpen: false,
+    level: 1, qIndex: 0, results: [], asked: new Set(), current: null, answered: false, timer: null, shownAt: 0, all: null, view: 'menu'
+  };
+  const saveSettings = () => save('geo-settings-v2', { topic: state.topic, region: state.region, modes: state.modes, game: state.game, look: state.look, lang: state.lang });
+  Object.defineProperty(state, 'mode', { get() { return this.modes[this.topic]; }, set(v) { this.modes[this.topic] = v; } });
+  const L = () => T[state.lang];
+  const nm = c => state.lang === 'it' ? BY[c].ni : BY[c].n;
+  const capOf = c => state.lang === 'it' ? BY[c].capi : BY[c].cap;
+  const rg = r => L().regions[r];
+  function applyLook() { document.body.dataset.look = state.look; document.documentElement.lang = state.lang; }
+  applyLook();
+
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const secs = ms => (ms / 1000).toFixed(1).replace('.', state.lang === 'it' ? ',' : '.') + ' s';
+  const flag = (c, alt, cls) => `<img class="flag ${cls || ''}" data-flag="${c}" src="${SRC[c]}" alt="${alt || ''}">`;
+
+  let ov = null; // per-question override used by the daily tour
+  const TP = () => ov ? ov.topic : state.topic, MD = () => ov ? ov.mode : state.mode, RG = () => ov ? 'World' : state.region;
+  const topicSet = () => setFor(TP());
+  const inRegion = c => RG() === 'World' || BY[c].r === RG();
+  const regionPool = () => topicSet().filter(f => inRegion(f.c)).sort((a, b) => a.t - b.t);
+  function levelPool(level) {
+    const pool = regionPool();
+    const upto = Math.max(8, Math.ceil(pool.length * level / LEVELS));
+    const from = level === 1 ? 0 : Math.ceil(pool.length * (level - 1) / LEVELS);
+    return { all: pool.slice(0, upto), fresh: pool.slice(from, upto), pool };
+  }
+  const TRICKY = [0, 0, 1, 2, 4, 5]; // deliberately confusing options per level
+
+  // Confusing options: look-alike flags, or for capitals, countries from the same part of the world
+  function trickyFor(code) {
+    if (TP() === 'flags') return BY[code].sim.filter(c => inRegion(c)).slice(0, 8);
+    if (TP() === 'shapes') return SHAPES.sim[code].filter(c => inRegion(c)).slice(0, 8);
+    const set = topicSet();
+    return set.filter(f => f.c !== code && f.r === BY[code].r && Math.abs(f.t - BY[code].t) <= 1).map(f => f.c);
+  }
+  function buildOptions(code, tricky, easyPool, widePool) {
+    if (TP() === 'cities') return [];
+    const chosen = new Set([code]);
+    for (const c of shuffle(trickyFor(code))) { if (chosen.size > tricky) break; chosen.add(c); }
+    for (const f of shuffle(easyPool)) { if (chosen.size >= 6) break; chosen.add(f.c); }
+    for (const f of shuffle(widePool)) { if (chosen.size >= 6) break; chosen.add(f.c); }
+    for (const f of shuffle(topicSet())) { if (chosen.size >= 6) break; chosen.add(f.c); }
+    return shuffle([...chosen]);
+  }
+  function makeLevelQuestion() {
+    const { all, fresh, pool } = levelPool(state.level);
+    let cands = (Math.random() < 0.7 ? fresh : all).filter(f => !state.asked.has(f.c));
+    if (!cands.length) cands = all.filter(f => !state.asked.has(f.c));
+    if (!cands.length) { state.asked.clear(); cands = all; }
+    const a = pick(cands);
+    state.asked.add(a.c);
+    return { answer: a.c, options: buildOptions(a.c, TRICKY[state.level], state.level <= 2 ? all : pool, pool) };
+  }
+
+  // ---------- "every one" mode ----------
+  const allKey = () => `geo-all-${state.topic}-${state.mode}-${state.region}`;
+  function newAllRun() {
+    const byTier = {};
+    regionPool().forEach(f => (byTier[f.t] = byTier[f.t] || []).push(f.c));
+    const queue = Object.keys(byTier).sort().flatMap(k => shuffle(byTier[k]));
+    return { queue, total: queue.length, done: 0, misses: {}, firstTry: 0, answers: 0 };
+  }
+  function makeAllQuestion() {
+    const a = state.all, code = a.queue[0], pool = regionPool();
+    const near = pool.filter(f => Math.abs(f.t - BY[code].t) <= 1);
+    return { answer: code, options: buildOptions(code, 2, near, pool), again: !!a.misses[code] };
+  }
+
+  // ---------- icons ----------
+  const globe = () => state.look === 'playful'
+    ? `<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="25" r="20" fill="#2a7fc0"/><circle cx="24" cy="23" r="20" fill="#5fd18f"/><path d="M8 17c5 1 7-3 12-2s3 7 8 7 6-5 11-4c2 4 2 9 0 13-5 1-6-3-10-2s-2 6-7 8c-6-1-12-6-14-11 0-3 0-6 0-9z" fill="#3eaee8"/><circle cx="18" cy="20" r="2.2" fill="#13315c"/><circle cx="30" cy="20" r="2.2" fill="#13315c"/><path d="M18 28c3 3 9 3 12 0" stroke="#13315c" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`
+    : `<svg width="42" height="42" viewBox="0 0 42 42" aria-hidden="true"><circle cx="21" cy="21" r="18" fill="none" stroke="var(--sun)" stroke-width="2.5"/><ellipse cx="21" cy="21" rx="8" ry="18" fill="none" stroke="var(--sun)" stroke-width="2"/><path d="M3 21h36M6 12h30M6 30h30" stroke="var(--sun)" stroke-width="2" fill="none"/></svg>`;
+  const clockOff = `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M4 4l16 16" stroke="var(--sun-edge)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  const bolt = `<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>`;
+  const star = on => `<svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z" fill="${on ? 'var(--sun)' : 'rgba(127,160,195,0.3)'}" stroke="${on ? 'var(--sun-edge)' : 'none'}" stroke-width="1"/></svg>`;
+
+  // ---------- header ----------
+  function header(inGame) {
+    return `<div class="topbar"><div class="brand">${globe()}<div><h1>Geo Explorer</h1><div class="sub">${L().tagline}</div></div></div>
+      <div class="top-actions">
+        ${inGame !== false ? '' : `<button class="ghost stamps-link" id="stamps-btn">${L().myStamps(stampTotals().earned, stampTotals().total)}</button>`}
+        <div class="seg" role="group" aria-label="Language"><button id="lang-en" data-lang="en" aria-pressed="${state.lang === 'en'}">EN</button><button id="lang-it" data-lang="it" aria-pressed="${state.lang === 'it'}">IT</button></div>
+        ${inGame === true ? `<button class="ghost" id="menu-btn">${L().home}</button>` : ''}
+      </div></div>`;
+  }
+  function wireHeader() {
+    app.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => {
+      if (state.lang === b.dataset.lang) return;
+      state.lang = b.dataset.lang; applyLook(); saveSettings(); rerender();
+    });
+    const m = document.getElementById('menu-btn'); if (m) m.onclick = renderHome;
+    const sb = document.getElementById('stamps-btn'); if (sb) sb.onclick = renderStamps;
+  }
+  function rerender() {
+    if (state.view === 'home') return renderHome();
+    if (state.view === 'setup') return renderSetup();
+    if (state.view === 'stamps') return renderStamps();
+    if (state.view === 'tourDone') return renderTourDone();
+    if (state.view === 'summary') return renderSummary();
+    if (state.view === 'allDone') return renderAllDone();
+    const wasAnswered = state.answered, picked = state.lastPick;
+    renderQuestion(true);
+    if (wasAnswered) { state.answered = false; answer(picked, true); }
+  }
+
+  // ---------- flag of the day ----------
+  function seeded(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; }; }
+  const DAY_ORDER = (() => { const r = seeded(20261111), a = FLAGS.map(f => f.c); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
+  function todayCode() {
+    const d = new Date(), day = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+    return DAY_ORDER[day % DAY_ORDER.length];
+  }
+  let fotdRevealed = false;
+  function postcard() {
+    const l = L(), c = todayCode(), f = BY[c], twin = f.sim[0];
+    const date = new Date().toLocaleDateString(state.lang === 'it' ? 'it-IT' : 'en-GB', { day: 'numeric', month: 'long' });
+    return `<div class="postcard"><div class="pc-inner">
+      <div class="pc-flag">${flag(c, l.whoseToday)}</div>
+      <div class="pc-body">
+        <div class="pc-eyebrow">${l.fotd} · ${date}</div>
+        ${fotdRevealed
+          ? `<div class="pc-name">${esc(nm(c))}</div>
+             <div class="pc-facts">${capOf(c) ? `${l.capital} ${esc(capOf(c))} · ` : ''}${esc(rg(f.r))}</div>
+             <div class="pc-twin">${l.mixUp} ${flag(twin)} <b>${esc(nm(twin))}</b></div>
+             <button class="ghost pc-practise" id="fotd-practise">${l.practise(rg(f.r))}</button>`
+          : `<div class="pc-q">${l.whoseToday}</div><button class="ghost pc-practise" id="fotd-reveal">${l.reveal}</button>`}
+      </div>
+      <svg class="pc-stamp" viewBox="0 0 60 70" aria-hidden="true"><rect x="2" y="2" width="56" height="66" rx="3" fill="#fff" stroke="#c9b9a0" stroke-dasharray="3 2"/><rect x="8" y="8" width="44" height="54" fill="#ffd23f"/><circle cx="30" cy="33" r="14" fill="#3eaee8"/><path d="M19 30c4 1 6-2 9-1s2 5 6 5 4-3 7-2" stroke="#2fae74" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    </div></div>`;
+  }
+  function fotdMini() {
+    const l = L(), c = todayCode(), f = BY[c];
+    return `<div class="fotd-mini" id="fotd-mini">
+      ${flag(c, l.whoseToday)}
+      <div class="fm-txt"><span class="fm-eyebrow">${l.fotd}</span>
+        ${fotdRevealed ? `<span class="fm-main">${esc(nm(c))}</span><span class="fm-sub">${capOf(c) ? `${l.capital} ${esc(capOf(c))} · ` : ''}${l.mixUp} ${esc(nm(f.sim[0]))}</span>` : `<span class="fm-main">${l.whoseToday}</span><span class="fm-sub">${l.pinHint}</span>`}
+      </div>
+      ${fotdRevealed ? `<button class="ghost pc-practise" id="fotd-practise">${l.practise(rg(f.r))}</button>` : `<button class="ghost pc-practise" id="fotd-reveal">${l.reveal}</button>`}
+    </div>`;
+  }
+  function revealFotd() {
+    if (!fotdRevealed) {
+      fotdRevealed = true;
+      const m = document.getElementById('fotd-mini'); if (m) { m.outerHTML = fotdMini(); wirePostcard(); }
+    }
+    const c = CENTROID[todayCode()]; if (c) globe3.target = [c[0], Math.max(-50, Math.min(50, c[1]))];
+    const m2 = document.getElementById('fotd-mini'); if (m2) { m2.classList.remove('pulse'); void m2.offsetWidth; m2.classList.add('pulse'); }
+  }
+  function wirePostcard() {
+    const r = document.getElementById('fotd-reveal');
+    if (r) r.onclick = revealFotd;
+    const p = document.getElementById('fotd-practise');
+    if (p) p.onclick = () => { state.topic = 'flags'; state.region = BY[todayCode()].r; state.game = 'all'; saveSettings(); renderSetup(); };
+  }
+
+  // ---------- passport ----------
+  const TOPICS = ['flags', 'capitals', 'shapes', 'cities'];
+  const STAMP_REGIONS = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'World'];
+  const INK = { flags: '#c8324b', capitals: '#2b62b8', shapes: '#1f8a5b', cities: '#7a4cc2' };
+  function setFor(tp) { return tp === 'capitals' ? CAPITAL_SET : tp === 'shapes' ? SHAPE_SET : tp === 'cities' ? CITY_SET : FLAGS; }
+  function stampProgress(tp, r) {
+    const set = setFor(tp).filter(f => r === 'World' || f.r === r);
+    const n = set.filter(f => learned[tp].has(f.c)).length;
+    return { n, N: set.length, done: set.length > 0 && n === set.length };
+  }
+  const hashRot = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) | 0; return (Math.abs(h) % 23) - 11; };
+  const ICON = {
+    flags: '<path d="M40 64V36M40 37c6-4 12 4 20 0v14c-8 4-14-4-20 0" stroke="currentColor" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>',
+    capitals: '<path d="M37 44l13-8 13 8M39 46h22M41 48v12M47 48v12M53 48v12M59 48v12M38 62h24" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    shapes: '<path d="M38 44c3-6 9-8 13-5s9-2 11 3-1 8 1 12-6 8-11 6-7 2-11-2-6-9-3-14z" fill="currentColor" opacity="0.85"/>',
+    cities: '<path d="M50 63c-6-8-11-14-11-20a11 11 0 0 1 22 0c0 6-5 12-11 20z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="43" r="4" fill="currentColor"/>'
+  };
+  function stampSvg(tp, r) {
+    const p = stampProgress(tp, r), id = `arc-${tp}-${r.replace(/\s/g, '')}`;
+    const label = esc(rg(r).toUpperCase());
+    const big = r === 'World';
+    const ring = p.done ? '' : `<circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="${(289 * p.n / p.N).toFixed(1)} 289" transform="rotate(-90 50 50)" opacity="0.9"/>`;
+    return `<button class="stamp ${p.done ? 'earned' : ''} ${big ? 'world' : ''}" data-stamp="${r}" data-topic-stamp="${tp}" style="--ink:${INK[tp]};--rot:${hashRot(tp + r)}deg" aria-label="${esc(rg(r))}: ${p.n}/${p.N}">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <defs><path id="${id}" d="M 17 52 A 33 33 0 0 1 83 52"/></defs>
+        <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="${p.done ? 3.5 : 1.5}" ${p.done ? '' : 'stroke-dasharray="4 4"'}/>
+        ${ring}
+        <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text font-size="${label.length > 11 ? 8.5 : 10.5}" font-weight="700" letter-spacing="1" fill="currentColor"><textPath href="#${id}" startOffset="50%" text-anchor="middle">${label}</textPath></text>
+        <g transform="translate(0,-8)">${ICON[tp]}</g>
+        <text x="50" y="76" font-size="10.5" font-weight="700" text-anchor="middle" fill="currentColor">${p.done ? '★ ' + p.N + ' ★' : L().learnedOf(p.n, p.N)}</text>
+      </svg></button>`;
+  }
+  function stampTotals() {
+    let earned = 0, total = 0;
+    TOPICS.forEach(t => STAMP_REGIONS.forEach(r => { total++; if (stampProgress(t, r).done) earned++; }));
+    return { earned, total };
+  }
+  let ppSpread = 0;
+  const SPREADS = [['holder', 'flags'], ['capitals', 'shapes'], ['cities', 'landmarks']];
+  const spreadOf = tp => SPREADS.findIndex(s => s.includes(tp));
+  function passport() {
+    const l = L();
+    const holder = load('geo-holder', '');
+    const { earned, total } = stampTotals();
+    const pageNo = (s, side) => String(s * 2 + side + 1).padStart(2, '0');
+    const contents = t => {
+      const p = stampProgress(t, 'World'), pct = Math.round(100 * p.n / p.N);
+      return `<button class="visa" data-goto="${spreadOf(t)}" style="--ink:${INK[t]}">
+        <svg class="visa-ico" viewBox="30 30 40 40" aria-hidden="true">${ICON[t]}</svg>
+        <span class="visa-txt"><b>${l[t]}</b><span>${l.pageN(pageNo(spreadOf(t), SPREADS[spreadOf(t)].indexOf(t)))}</span></span>
+        <span class="visa-prog"><span class="vbar"><i style="width:${pct}%"></i></span>${p.n}/${p.N}</span></button>`;
+    };
+    const soon = t => `<button class="visa soon" data-goto="2"><span class="visa-txt"><b>${l[t]}</b><span>${l.coming}</span></span></button>`;
+    const mrzName = (holder || 'EXPLORER').toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '').slice(0, 14) || 'EXPLORER';
+    const mrz = (`P<GEO<<${mrzName}<<` + '<'.repeat(44)).slice(0, 44);
+    const page = (kind, side) => {
+      const cls = `page ${side ? 'right' : 'left'}`, no = pageNo(ppSpread, side);
+      if (kind === 'holder') return `<div class="${cls}">
+        <div class="pp-head"><span>${l.passport}</span><span>Geo Explorer</span></div>
+        <div class="holder">
+          <div class="photo">${globe()}</div>
+          <div class="holder-txt">
+            <label for="holder-name" class="pp-label">${l.holder}</label>
+            <input id="holder-name" type="text" maxlength="20" placeholder="${l.namePh}" value="${esc(holder)}" autocomplete="off">
+            <div class="pp-count">${l.stampsCount(earned, total)}</div>
+          </div>
+        </div>
+        <div class="pp-label">${l.contents}</div>
+        <div class="visas">${TOPICS.map(contents).join('')}${soon('landmarks')}</div>
+        <div class="mrz" aria-hidden="true">${esc(mrz)}</div>
+      </div>`;
+      if (TOPICS.includes(kind)) {
+        const got = STAMP_REGIONS.filter(r => stampProgress(kind, r).done).length;
+        return `<div class="${cls}" style="--ink:${INK[kind]}">
+          <div class="pp-head"><span class="pp-game">${l.stampsFor(l[kind])}</span><span>${no}</span></div>
+          <div class="pp-sub">${l.stampsOn(got, STAMP_REGIONS.length)}</div>
+          <div class="stamps">${STAMP_REGIONS.map(r => stampSvg(kind, r)).join('')}</div>
+          <p class="pp-hint">${l.stampHint}</p>
+        </div>`;
+      }
+      return `<div class="${cls}">
+        <div class="pp-head"><span>${l.stampsFor(l[kind])}</span><span>${no}</span></div>
+        <div class="pp-empty"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 5"/></svg><span>${l.coming}</span></div>
+      </div>`;
+    };
+    const tabs = SPREADS.map((s, i) => `<button class="pp-tab ${i === ppSpread ? 'on' : ''}" data-goto="${i}">${s.filter(k => k !== 'holder').map(k => l[k]).join(' · ')}${i === 0 ? '' : ''}</button>`).join('');
+    return `<div class="pp-wrap">
+      <div class="pp-tabs" role="group" aria-label="${l.passport}">${tabs}</div>
+      <div class="passport">${page(SPREADS[ppSpread][0], 0)}${page(SPREADS[ppSpread][1], 1)}</div>
+      <div class="pp-nav">
+        <button class="ghost" id="pp-prev" ${ppSpread === 0 ? 'disabled' : ''}>‹ ${l.prevPage}</button>
+        <span>${l.spreadN(ppSpread + 1, SPREADS.length)}</span>
+        <button class="ghost" id="pp-next" ${ppSpread === SPREADS.length - 1 ? 'disabled' : ''}>${l.nextPage} ›</button>
+      </div>
+    </div>`;
+  }
+  function focusStart() { const s = document.getElementById('start-panel'); if (s) s.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' }); }
+  function wirePassport() {
+    const inp = document.getElementById('holder-name');
+    if (inp) inp.addEventListener('change', () => { save('geo-holder', inp.value.trim()); renderStamps(); });
+    app.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => { ppSpread = +b.dataset.goto; renderStamps(); });
+    const pv = document.getElementById('pp-prev'), nx = document.getElementById('pp-next');
+    if (pv) pv.onclick = () => { ppSpread = Math.max(0, ppSpread - 1); renderStamps(); };
+    if (nx) nx.onclick = () => { ppSpread = Math.min(SPREADS.length - 1, ppSpread + 1); renderStamps(); };
+    app.querySelectorAll('[data-stamp]').forEach(b => b.onclick = () => { state.topic = b.dataset.topicStamp; state.region = b.dataset.stamp; state.game = 'all'; saveSettings(); renderSetup(); });
+  }
+
+  // ---------- globe ----------
+  const WORLD = (() => {
+    const raw = JSON.parse(document.getElementById('world-data').textContent), out = {};
+    for (const c in raw) {
+      out[c] = raw[c].map(flat => {
+        const pts = new Float32Array(flat.length); let x = 0, y = 0;
+        for (let i = 0; i < flat.length; i += 2) { x += flat[i]; y += flat[i + 1]; pts[i] = x / 10; pts[i + 1] = y / 10; }
+        return pts;
+      });
+    }
+    return out;
+  })();
+  const CENTROID = {};
+  for (const c in WORLD) {
+    const big = WORLD[c].reduce((a, b) => (b.length > a.length ? b : a));
+    let sx = 0, sy = 0, sz = 0;
+    for (let i = 0; i < big.length; i += 2) { const l = big[i] * Math.PI / 180, p = big[i + 1] * Math.PI / 180; sx += Math.cos(p) * Math.cos(l); sy += Math.cos(p) * Math.sin(l); sz += Math.sin(p); }
+    CENTROID[c] = [Math.atan2(sy, sx) * 180 / Math.PI, Math.atan2(sz, Math.hypot(sx, sy)) * 180 / Math.PI];
+  }
+  const globe3 = { lon: 12, lat: 22, target: null, dragging: false, raf: null, canvas: null, idleAt: 0 };
+  function drawGlobe() {
+    const cv = globe3.canvas; if (!cv || !cv.isConnected) { globe3.raf = null; return; }
+    const ctx = cv.getContext('2d'), W = cv.width, dpr = window.devicePixelRatio || 1;
+    const R = W / 2 - 6 * dpr, cx = W / 2, cy = W / 2;
+    const l0 = globe3.lon * Math.PI / 180, p0 = globe3.lat * Math.PI / 180, sp0 = Math.sin(p0), cp0 = Math.cos(p0);
+    const proj = (lon, lat) => {
+      const l = lon * Math.PI / 180 - l0, p = lat * Math.PI / 180, cp = Math.cos(p), sp = Math.sin(p), cl = Math.cos(l);
+      let x = R * cp * Math.sin(l), y = R * (cp0 * sp - sp0 * cp * cl);
+      const front = sp0 * sp + cp0 * cp * cl >= 0;
+      if (!front) { const k = R / (Math.hypot(x, y) || 1); x *= k; y *= k; }
+      return [cx + x, cy - y, front];
+    };
+    ctx.clearRect(0, 0, W, W);
+    const og = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.1, cx, cy, R);
+    og.addColorStop(0, '#8fdcff'); og.addColorStop(0.7, '#3a9be0'); og.addColorStop(1, '#1f68ad');
+    ctx.fillStyle = og; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.clip();
+    // graticule
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.lineWidth = dpr;
+    for (let lat = -60; lat <= 60; lat += 30) { ctx.beginPath(); let on = false; for (let lon = -180; lon <= 180; lon += 4) { const [x, y, f] = proj(lon, lat); if (f) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; } ctx.stroke(); }
+    for (let lon = -180; lon < 180; lon += 30) { ctx.beginPath(); let on = false; for (let lat = -88; lat <= 88; lat += 4) { const [x, y, f] = proj(lon, lat); if (f) { on ? ctx.lineTo(x, y) : ctx.moveTo(x, y); on = true; } else on = false; } ctx.stroke(); }
+    const today = todayCode(), anyLearned = c => learned.flags.has(c) || learned.capitals.has(c) || learned.shapes.has(c);
+    ctx.lineJoin = 'round'; ctx.lineWidth = 0.8 * dpr; ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    for (const c in WORLD) {
+      ctx.beginPath(); let any = false;
+      for (const ring of WORLD[c]) {
+        let vis = false; const pts = [];
+        for (let i = 0; i < ring.length; i += 2) { const p = proj(ring[i], ring[i + 1]); pts.push(p); if (p[2]) vis = true; }
+        if (!vis) continue; any = true;
+        ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.closePath();
+      }
+      if (!any) continue;
+      ctx.fillStyle = (c === today && fotdRevealed) ? '#ffd23f' : anyLearned(c) ? '#23a368' : '#86dcae';
+      ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    const sh = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R);
+    sh.addColorStop(0, 'rgba(255,255,255,0.35)'); sh.addColorStop(0.5, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(10,40,80,0.35)');
+    ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fill();
+    // today's pin
+    globe3.pin = null;
+    if (CENTROID[today]) {
+      const [x, y, f] = proj(CENTROID[today][0], CENTROID[today][1]);
+      if (f) {
+        const label = fotdRevealed ? nm(today) : '?';
+        ctx.font = `600 ${15 * dpr}px Fredoka, sans-serif`;
+        const w = ctx.measureText(label).width + 20 * dpr, h = 28 * dpr, top = y - 22 * dpr - h;
+        ctx.fillStyle = '#c8324b'; ctx.fillRect(x - 2 * dpr, top + h, 4 * dpr, 20 * dpr);
+        ctx.beginPath(); ctx.arc(x, y, 6 * dpr, 0, 7); ctx.fillStyle = '#c8324b'; ctx.fill(); ctx.lineWidth = 3 * dpr; ctx.strokeStyle = '#fff'; ctx.stroke();
+        ctx.fillStyle = '#c8324b'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - w / 2, top, w, h, 9 * dpr) : ctx.rect(x - w / 2, top, w, h); ctx.fill();
+        globe3.pin = [x - w / 2 - 6 * dpr, top - 6 * dpr, x + w / 2 + 6 * dpr, y + 10 * dpr];
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, x, top + h / 2 + dpr);
+      }
+    }
+  }
+  function globeLoop() {
+    if (!globe3.canvas || !globe3.canvas.isConnected) { globe3.raf = null; return; }
+    if (globe3.target) {
+      const t = globe3.target; let dl = ((t[0] - globe3.lon + 540) % 360) - 180;
+      globe3.lon += dl * 0.08; globe3.lat += (t[1] - globe3.lat) * 0.08;
+      if (Math.abs(dl) < 0.2 && Math.abs(t[1] - globe3.lat) < 0.2) globe3.target = null;
+    } else if (!globe3.dragging && !reduceMotion && performance.now() - globe3.idleAt > 2500 && !fotdRevealed) {
+      globe3.lon -= 0.12;
+    }
+    drawGlobe();
+    globe3.raf = requestAnimationFrame(globeLoop);
+  }
+  function mountGlobe() {
+    const cv = document.getElementById('globe'); if (!cv) return;
+    const size = Math.round(cv.getBoundingClientRect().width * (window.devicePixelRatio || 1));
+    cv.width = cv.height = size || 800;
+    globe3.canvas = cv;
+    let last = null, downAt = null;
+    const onPin = e => {
+      if (!globe3.pin) return false;
+      const r = cv.getBoundingClientRect(), k = cv.width / r.width, x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k, p = globe3.pin;
+      return x >= p[0] && x <= p[2] && y >= p[1] && y <= p[3];
+    };
+    cv.addEventListener('pointerdown', e => {
+      downAt = [e.clientX, e.clientY];
+      if (onPin(e)) return;
+      globe3.dragging = true; globe3.target = null; last = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId);
+    });
+    cv.addEventListener('click', e => { if (onPin(e) && downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 6) revealFotd(); });
+    cv.addEventListener('pointermove', e => {
+      if (!globe3.dragging) { cv.style.cursor = onPin(e) ? 'pointer' : ''; return; }
+      const k = 180 / (cv.getBoundingClientRect().width || 400);
+      globe3.lon -= (e.clientX - last[0]) * k; globe3.lat = Math.max(-70, Math.min(70, globe3.lat + (e.clientY - last[1]) * k));
+      last = [e.clientX, e.clientY];
+    });
+    const end = () => { globe3.dragging = false; globe3.idleAt = performance.now(); };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    if (fotdRevealed && CENTROID[todayCode()]) { const c = CENTROID[todayCode()]; globe3.lon = c[0]; globe3.lat = Math.max(-50, Math.min(50, c[1])); }
+    if (!globe3.raf) globe3.raf = requestAnimationFrame(globeLoop);
+  }
+
+  // ---------- cities on a map ----------
+  const MAP_VIEW = { Europe: [-25, 34, 45, 71], Asia: [25, -11, 150, 56], Africa: [-26, -36, 58, 38], 'North America': [-170, 6, -50, 74], 'South America': [-93, -57, -28, 14], Oceania: [110, -48, 190, 10] };
+  const NEAR_KM = { Europe: 150, Asia: 350, Africa: 300, 'North America': 300, 'South America': 250, Oceania: 300 };
+  const RAD = Math.PI / 180;
+  const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * RAD / 2)) / RAD;
+  const invMercY = y => (2 * Math.atan(Math.exp(y * RAD)) - Math.PI / 2) / RAD;
+  const kmBetween = (a, b) => {
+    const dLat = (b.lat - a.lat) * RAD, dLon = (b.lon - a.lon) * RAD;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * RAD) * Math.cos(b.lat * RAD) * Math.sin(dLon / 2) ** 2;
+    return 6371 * 2 * Math.asin(Math.min(1, Math.sqrt(h)));
+  };
+  const mapCache = {};
+  function mapFor(region) {
+    if (mapCache[region]) return mapCache[region];
+    const [lo, la0, hi, la1] = MAP_VIEW[region], wrap = hi > 180;
+    const y0 = mercY(la1), y1 = mercY(la0), pad = 2;
+    const vb = [lo - pad, -y0 - pad, hi - lo + 2 * pad, y0 - y1 + 2 * pad];
+    const sx = lon => (wrap && lon < -30 ? lon + 360 : lon);
+    const paths = {};
+    for (const c in WORLD) {
+      let d = '';
+      for (const ring of WORLD[c]) {
+        let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;
+        const shift = wrap && ring[0] < -30 ? 360 : 0;
+        const pts = [];
+        for (let i = 0; i < ring.length; i += 2) {
+          const x = ring[i] + shift, y = -mercY(Math.max(-85, Math.min(85, ring[i + 1])));
+          pts.push(x.toFixed(2) + ' ' + y.toFixed(2));
+          if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y;
+        }
+        if (maxx < vb[0] - 5 || minx > vb[0] + vb[2] + 5 || maxy < vb[1] - 5 || miny > vb[1] + vb[3] + 5) continue;
+        d += 'M' + pts.join('L') + 'Z';
+      }
+      if (d) paths[c] = d;
+    }
+    return (mapCache[region] = { vb, paths, sx, toXY: (lat, lon) => [sx(lon), -mercY(lat)], toLL: (x, y) => ({ lon: ((x + 540) % 360) - 180, lat: invMercY(-y) }) });
+  }
+  function cityMapSvg(city) {
+    const m = mapFor(city.r);
+    const land = Object.entries(m.paths).map(([c, d]) => `<path class="land" data-cc="${c}" d="${d}"/>`).join('');
+    return `<div class="mapbox"><svg id="citymap" viewBox="${m.vb.join(' ')}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(L().mapLabel(rg(city.r)))}">
+      <rect x="${m.vb[0]}" y="${m.vb[1]}" width="${m.vb[2]}" height="${m.vb[3]}" class="sea"/>
+      <g class="lands">${land}</g><g id="marks"></g></svg></div>`;
+  }
+  function wireCityMap(city) {
+    const svg = document.getElementById('citymap'); if (!svg) return;
+    svg.addEventListener('click', e => {
+      if (state.answered) return;
+      const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+      const ll = mapFor(city.r).toLL(p.x, p.y);
+      answer({ lat: ll.lat, lon: ll.lon });
+    });
+  }
+  function drawCityResult(city, pick, ok) {
+    const m = mapFor(city.r), svg = document.getElementById('citymap'); if (!svg) return;
+    const s = m.vb[2] / 100; // marker scale relative to the view
+    const [tx, ty] = m.toXY(city.lat, city.lon);
+    let html = '';
+    if (pick) {
+      const [px, py] = m.toXY(pick.lat, pick.lon);
+      html += `<line x1="${px}" y1="${py}" x2="${tx}" y2="${ty}" class="miss-line" stroke-width="${0.45 * s}" stroke-dasharray="${1.2 * s} ${0.9 * s}"/>`;
+      html += `<g class="pick ${ok ? 'ok' : ''}"><circle cx="${px}" cy="${py}" r="${1.1 * s}" stroke-width="${0.35 * s}"/></g>`;
+    }
+    html += `<circle cx="${tx}" cy="${ty}" r="${1.4 * s}" class="truth" stroke-width="${0.45 * s}"/>`;
+    html += `<text x="${tx}" y="${ty - 2.4 * s}" font-size="${3 * s}" class="truth-label" stroke-width="${0.6 * s}">${esc(nm(city.c))}</text>`;
+    const cc = svg.querySelector(`path[data-cc="${city.cc}"]`); if (cc) cc.classList.add('home-country');
+    svg.querySelector('#marks').innerHTML = html;
+  }
+
+  // ---------- today's world tour ----------
+  const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const TOUR_MIX = [['flags', 3], ['capitals', 2], ['shapes', 3], ['cities', 2]];
+  function buildTour() {
+    const d = new Date(), r = seeded(d.getFullYear() * 1000 + d.getMonth() * 40 + d.getDate() + 7);
+    const used = new Set(), list = [];
+    for (const [tp, n] of TOUR_MIX) {
+      const pool = setFor(tp).filter(f => f.t <= (tp === 'cities' ? 3 : 4));
+      let k = 0;
+      while (k < n) {
+        const f = pool[Math.floor(r() * pool.length)];
+        if (used.has(f.c)) continue;
+        used.add(f.c); k++;
+        list.push({ code: f.c, topic: tp, mode: tp === 'shapes' ? 'name' : tp === 'cities' ? 'find' : (r() < 0.5 ? 'find' : 'name') });
+      }
+    }
+    for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+    return list;
+  }
+  function startTour() {
+    state.game = 'tour'; state.tour = buildTour(); state.qIndex = 0; state.results = [];
+    nextQuestion();
+  }
+  function makeTourQuestion() {
+    const item = state.tour[state.qIndex];
+    ov = { topic: item.topic, mode: item.mode };
+    const pool = topicSet(), near = pool.filter(f => Math.abs(f.t - BY[item.code].t) <= 1);
+    return { answer: item.code, options: buildOptions(item.code, 2, near, pool), topic: item.topic };
+  }
+  function renderTourDone() {
+    const first = state.view !== 'tourDone';
+    state.view = 'tourDone';
+    const l = L(), right = state.results.filter(r => r.ok), n = right.length;
+    const avg = n ? right.reduce((s, r) => s + r.ms, 0) / n : null;
+    if (first) save('geo-tour-' + dayKey(), { n, avg });
+    const misses = state.results.filter(r => !r.ok);
+    const stars = n >= 10 ? 3 : n >= 8 ? 2 : n >= 5 ? 1 : 0;
+    ov = null;
+    const sugT = suggestNext();
+    app.innerHTML = `${header(true)}
+      <div class="panel summary enter">
+        <div class="stars">${star(stars >= 1)}${star(stars >= 2)}${star(stars >= 3)}</div>
+        <h2>${l.tourDoneTitle(n)}</h2>
+        <div class="stats">
+          <div class="stat"><b>${n}/10</b><span>${l.tourRight}</span></div>
+          <div class="stat"><b>${avg ? secs(avg) : '–'}</b><span>${l.avg}</span></div>
+          <div class="stat"><b>${l.tomorrow}</b><span>${l.tomorrowNote}</span></div>
+        </div>
+        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => m.topic === 'cities' ? reviewCard(m.c, l.kmAway(Math.round(m.picked.km))) : `<div class="card">${m.topic === 'shapes' ? shape(m.c, 'mini') : flag(m.c)}${esc(nm(m.c))}${m.topic === 'capitals' ? `<span>${esc(capOf(m.c))}</span>` : ''}</div>`).join('')}</div>` : ''}
+        <div class="btn-row">${sugT ? `<button class="primary" id="sug-btn">${esc(suggestLabel(sugT))}</button>` : ''}<button class="${sugT ? 'ghost' : 'primary'}" id="home-after">${l.backHome}</button></div>
+      </div>`;
+    wireHeader();
+    document.getElementById('home-after').onclick = renderHome;
+    const sb2 = document.getElementById('sug-btn'); if (sb2) sb2.onclick = () => playSuggestion(sugT);
+    if (first && state.look === 'playful' && stars >= 2) confetti(app.querySelector('.stars'), 140);
+  }
+
+  // ---------- what to play next ----------
+  function suggestNext() {
+    const order = [state.topic, ...TOPICS.filter(t => t !== state.topic)];
+    const regions = STAMP_REGIONS.filter(r => r !== 'World');
+    for (const t of order) {
+      const open = regions.filter(r => !stampProgress(t, r).done);
+      if (!open.length) continue;
+      const started = open.filter(r => stampProgress(t, r).n > 0 && !(t === state.topic && r === state.region && state.view === 'allDone'));
+      const pickR = (started.length ? started : open).sort((a, b) => stampProgress(t, b).n / stampProgress(t, b).N - stampProgress(t, a).n / stampProgress(t, a).N)[0];
+      return { topic: t, region: pickR };
+    }
+    return null;
+  }
+  function playSuggestion(s) { state.topic = s.topic; state.region = s.region; state.game = 'all'; saveSettings(); startAll(true); }
+  const suggestLabel = s => L().nextUp(L()[s.topic], rg(s.region));
+
+  // ---------- home ----------
+  function renderHome() {
+    clearTimeout(state.timer); state.view = 'home'; ov = null;
+    const l = L(), done = load('geo-tour-' + dayKey(), null), sug = suggestNext();
+    const date = new Date().toLocaleDateString(state.lang === 'it' ? 'it-IT' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    const card = tp => {
+      const set = setFor(tp), n = set.filter(f => learned[tp].has(f.c)).length, pct = Math.round(100 * n / set.length);
+      return `<button class="gcard" data-game-card="${tp}" style="--ink:${INK[tp]}"><span class="gname">${l[tp]}</span><span class="gdesc">${l[tp + 'Desc']}</span><span class="vbar"><i style="width:${pct}%"></i></span><span class="gprog">${l.learnedN(n, set.length)}</span></button>`;
+    };
+    const soon = tp => `<div class="gcard soon"><span class="gname">${l[tp]}</span><span class="gdesc">${l.coming}</span></div>`;
+    const mix = TOUR_MIX.map(([tp, n]) => `<span class="mix" style="--ink:${INK[tp]}"><svg viewBox="30 30 40 40" aria-hidden="true">${ICON[tp]}</svg>${l.mixN(n, tp)}</span>`).join('');
+    app.innerHTML = `${header(false)}
+      <div class="home-hero">
+        <div class="hero-text">
+          <span class="eyebrow">${esc(date)}</span>
+          ${done && sug ? `<h2 class="hero-title">${l.tourDoneHero}</h2>
+          <p class="hero-sub">${l.tourDoneSub(done.n)}</p>
+          <div class="hero-cta">
+            <button class="primary big" id="next-btn-home">${esc(suggestLabel(sug))}</button>
+            <button class="linkish" id="tour-btn">${l.replayTour}</button>
+          </div>` : `<h2 class="hero-title">${l.tourTitle}</h2>
+          <p class="hero-sub">${l.tourSub}</p>
+          <div class="mixes">${mix}</div>
+          <div class="hero-cta">
+            <button class="primary big" id="tour-btn">${done ? l.tourAgain : l.playTour}</button>
+            <span class="hero-note">${l.sameForAll}</span>
+          </div>`}
+        </div>
+        <div class="hero-globe">
+          <canvas id="globe" aria-label="${l.globeLabel}" role="img"></canvas>
+          <span class="globe-hint">${l.dragSpin}</span>
+          ${fotdMini()}
+        </div>
+      </div>
+      <div class="label">${l.orPlay}</div>
+      <div class="gcards">${TOPICS.map(card).join('')}${soon('landmarks')}</div>
+      <p class="credits">${l.legend} ${l.credits}</p>`;
+    wireHeader(); wirePostcard();
+    document.getElementById('tour-btn').onclick = startTour;
+    const nh = document.getElementById('next-btn-home'); if (nh) nh.onclick = () => playSuggestion(sug);
+    app.querySelectorAll('[data-game-card]').forEach(b => b.onclick = () => { state.topic = b.dataset.gameCard; saveSettings(); renderSetup(); });
+    mountGlobe();
+  }
+
+  function renderStamps() {
+    clearTimeout(state.timer); state.view = 'stamps'; ov = null;
+    app.innerHTML = `${header('sub')}<div class="setup-head"><button class="ghost" id="home-btn">‹ ${L().home}</button><h2 class="setup-title">${L().stampsTitle}</h2></div>${passport()}`;
+    wireHeader(); wirePassport();
+    document.getElementById('home-btn').onclick = renderHome;
+  }
+
+  // ---------- game setup ----------
+  function renderSetup() {
+    clearTimeout(state.timer); state.view = 'setup'; ov = null;
+    if (state.game !== 'all' && state.game !== 'levels') state.game = 'all';
+    const l = L(), tp = state.topic, noun = l.noun[tp];
+    const total = regionPool().length;
+    const saved = state.game === 'all' ? load(allKey(), null) : null;
+    const setCount = topicSet().length;
+    const learnedHere = topicSet().filter(f => learned[tp].has(f.c)).length;
+    const chip = (attr, val, cur, label) => `<button class="chip" id="${attr}-${val.replace(/\s/g, '-').toLowerCase()}" data-${attr}="${val}" aria-pressed="${cur === val}">${label}</button>`;
+    const gameCard = (key, active, disabled) => `<button class="game ${active ? 'active' : ''}" ${disabled ? 'disabled' : `data-topic="${key}"`} ${active ? 'aria-current="true"' : ''}>${disabled ? `<span class="tag">${l.coming}</span>` : ''}<h2>${l[key]}</h2><p>${l[key + 'Desc']}</p></button>`;
+    app.innerHTML = `
+      ${header('sub')}
+      <div class="setup-head"><button class="ghost" id="home-btn">‹ ${l.home}</button><h2 class="setup-title">${l[tp]}</h2><span class="setup-desc">${l[tp + 'Desc']}</span></div>
+      <div class="panel" id="start-panel">
+        <div class="field"><span class="label" id="lbl-game">${l.howTo}</span>
+          <div class="chips" role="group" aria-labelledby="lbl-game">
+            ${chip('game', 'all', state.game, l.allMode[tp])}${chip('game', 'levels', state.game, l.levelsMode)}
+          </div></div>
+        <div class="calm">${clockOff}<span>${state.game === 'all' ? l.noteAll(total, noun) : l.noteLevels(noun)}</span></div>
+        <div class="start-row">
+          ${state.game === 'levels'
+            ? `<button class="primary" id="start-btn">${l.startLevels}</button>`
+            : saved && saved.queue.length
+              ? `<button class="primary" id="resume-btn">${l.resume(saved.done, saved.total)}</button><button class="ghost" id="restart-btn">${l.restart}</button>`
+              : `<button class="primary" id="start-all">${l.startAll}</button>`}
+          <span class="progress-note">${l.learned(l.Noun[tp], learnedHere, setCount)}</span>
+        </div>
+        <details class="opts" id="opts" ${state.optsOpen ? 'open' : ''}>
+          <summary>${l.options}: <span class="cur">${l.styles[tp][state.mode]}</span> · <span class="cur">${rg(state.region)}</span> · <span class="cur">${state.look === 'playful' ? l.playful : l.calm}</span><span class="change">${l.change}</span></summary>
+          <div class="opts-body">
+            ${tp === 'cities' ? '' : `<div class="field"><span class="label" id="lbl-mode">${l.qStyle}</span><div class="chips" role="group" aria-labelledby="lbl-mode">
+              ${chip('mode', 'find', state.mode, l.styles[tp].find)}${chip('mode', 'name', state.mode, l.styles[tp].name)}</div></div>`}
+            <div class="field"><span class="label" id="lbl-region">${l.region}</span><div class="chips" role="group" aria-labelledby="lbl-region">
+              ${REGIONS.map(r => chip('region', r, state.region, `${rg(r)} <small>${topicSet().filter(f => r === 'World' || f.r === r).length}</small>`)).join('')}</div></div>
+            <div class="field"><span class="label" id="lbl-theme">${l.theme}</span><div class="chips" role="group" aria-labelledby="lbl-theme">
+              ${chip('look', 'playful', state.look, l.playful)}${chip('look', 'calm', state.look, l.calm)}</div></div>
+          </div>
+        </details>
+      </div>
+      <p class="credits">${l.credits}</p>`;
+    wireHeader();
+    document.getElementById('home-btn').onclick = renderHome;
+    const opts = document.getElementById('opts');
+    opts.addEventListener('toggle', () => { state.optsOpen = opts.open; });
+    const set = (attr, fn) => app.querySelectorAll(`[data-${attr}]`).forEach(b => b.onclick = () => { fn(b.dataset[attr]); saveSettings(); renderSetup(); });
+    set('game', v => state.game = v);
+    set('mode', v => state.mode = v);
+    set('region', v => state.region = v);
+    set('look', v => { state.look = v; applyLook(); });
+    const on = (id, fn) => { const e = document.getElementById(id); if (e) e.onclick = fn; };
+    on('start-btn', () => startLevel(1, true));
+    on('start-all', () => startAll(false));
+    on('resume-btn', () => startAll(true));
+    on('restart-btn', () => { drop(allKey()); startAll(false); });
+  }
+
+  function startLevel(level, fresh) {
+    state.game = 'levels';
+    if (fresh) state.asked = new Set();
+    state.level = level; state.qIndex = 0; state.results = [];
+    nextQuestion();
+  }
+  function startAll(resume) {
+    state.game = 'all';
+    const saved = resume ? load(allKey(), null) : null;
+    state.all = saved && saved.queue && saved.queue.length ? saved : newAllRun();
+    save(allKey(), state.all);
+    nextQuestion();
+  }
+  function nextQuestion() {
+    clearTimeout(state.timer);
+    if (state.game !== 'tour') ov = null;
+    state.current = state.game === 'all' ? makeAllQuestion() : state.game === 'tour' ? makeTourQuestion() : makeLevelQuestion();
+    state.answered = false;
+    renderQuestion();
+  }
+
+  function hud() {
+    if (state.game === 'all') {
+      const a = state.all, pct = Math.round(100 * a.done / a.total);
+      return `<div class="hud"><div class="bar-wrap"><div class="bar"><span style="width:${pct}%"></span></div>
+        <div class="bar-text"><span>${L().progress(a.done, a.total)}</span><span>${L().toGo(a.queue.length)}</span></div></div>
+        ${state.current && state.current.again && state.view === 'question' ? `<span class="again-note">${L().backAgain}</span>` : ''}</div>`;
+    }
+    const lv = Array.from({ length: LEVELS }, (_, i) => {
+      const n = i + 1, cls = n < state.level ? 'done' : n === state.level ? 'now' : '';
+      return `<span class="lv ${cls}" aria-label="${L().level} ${n}">${n}</span>`;
+    }).join('');
+    const dots = Array.from({ length: PER_LEVEL }, (_, i) => {
+      const r = state.results[i];
+      return `<i class="${r ? (r.ok ? 'ok' : 'no') : i === state.qIndex ? 'cur' : ''}"></i>`;
+    }).join('');
+    const left = state.game === 'tour' ? `<div class="levels"><span class="cap">${L().tourLabel}</span></div>` : `<div class="levels"><span class="cap">${L().level}</span>${lv}</div>`;
+    return `<div class="hud">${left}<div class="dots">${dots}</div></div>`;
+  }
+
+  // What each option button shows, and what it reveals after a wrong answer
+  function optionLabel(c) {
+    if (TP() === 'capitals' && MD() === 'find') return { main: capOf(c), sub: nm(c) };
+    if (TP() === 'capitals') return { main: nm(c), sub: capOf(c) };
+    return { main: nm(c), sub: '' };
+  }
+
+  function renderQuestion(keepTime) {
+    state.view = 'question';
+    const l = L(), q = state.current, c0 = q.answer, tp = TP();
+    const regionNote = RG() === 'World' ? rg(BY[c0].r) : l.only(rg(RG()));
+    const ask = l.ask[tp][MD()];
+    let prompt, options;
+    const pic = c => tp === 'shapes' ? shape(c) : flag(c);
+    if (tp === 'cities') {
+      const city = BY[c0];
+      prompt = `<div class="question city-q"><span class="ask">${ask}</span><span class="country">${esc(nm(c0))}</span><span class="hint city-hint">${flag(city.cc, '', 'tiny')}${esc(city.isCap ? l.capitalOf(nm(city.cc)) : l.cityIn(nm(city.cc)))}</span></div>`;
+      options = cityMapSvg(city);
+    } else if (tp !== 'capitals' && MD() === 'find') {
+      prompt = `<div class="question"><span class="ask">${ask}</span><span class="country">${esc(nm(c0))}</span><span class="hint">${esc(regionNote)}</span></div>`;
+      options = `<div class="grid" id="options">${q.options.map((c, i) => `<button class="tile" data-c="${c}" id="opt-${i + 1}" aria-label="${i + 1}"><span class="key">${i + 1}</span><span class="imgbox">${pic(c)}</span><span class="nm">${esc(nm(c))}</span></button>`).join('')}</div>`;
+    } else {
+      if (tp === 'flags') prompt = `<div class="question"><span class="ask">${ask}</span></div><div class="bigflag">${flag(c0, ask)}</div>`;
+      else if (tp === 'shapes') prompt = `<div class="question"><span class="ask">${ask}</span></div><div class="bigflag bigshape">${shape(c0)}</div>`;
+      else if (MD() === 'find') prompt = `<div class="question">${flag(c0, '', 'qflag')}<span class="ask">${ask}</span><span class="country">${esc(nm(c0))}</span><span class="hint">${esc(regionNote)}</span></div>`;
+      else prompt = `<div class="question"><span class="ask">${ask}</span><span class="country">${esc(capOf(c0))}</span><span class="hint">${esc(regionNote)}</span></div>`;
+      options = `<div class="names" id="options">${q.options.map((c, i) => { const o = optionLabel(c); return `<button class="name-btn" data-c="${c}" id="opt-${i + 1}"><span class="key">${i + 1}</span><span class="txt"><span>${esc(o.main)}</span>${o.sub ? `<span class="sub-nm">${esc(o.sub)}</span>` : ''}</span>${tp === 'shapes' ? shape(c, 'mini') : flag(c)}</button>`; }).join('')}</div>`;
+    }
+    app.innerHTML = `${header(true)}${hud()}<div class="stage ${keepTime ? '' : 'enter'}">${prompt}${options}</div>
+      <div class="feedback" id="feedback"><span class="idle">${l.idle}</span></div>`;
+    wireHeader();
+    app.querySelectorAll('#options [data-c]').forEach(b => b.onclick = () => answer(b.dataset.c));
+    if (tp === 'cities') wireCityMap(BY[c0]);
+    if (!keepTime) state.shownAt = performance.now();
+  }
+
+  function answer(c, replaying) {
+    if (state.answered) return;
+    state.answered = true; state.lastPick = c;
+    const l = L(), q = state.current, code = q.answer, tp = TP();
+    if (tp === 'cities' && c && c.km == null) c.km = kmBetween(c, BY[code]);
+    const ok = tp === 'cities' ? c.km <= NEAR_KM[BY[code].r] : c === code;
+    if (!replaying) {
+      const ms = performance.now() - state.shownAt;
+      if (ok) { learned[tp].add(code); save(`geo-${tp}-learned`, [...learned[tp]]); }
+      if (state.game === 'all') {
+        const a = state.all;
+        a.answers++; a.queue.shift();
+        if (ok) { a.done++; if (!a.misses[code]) a.firstTry++; }
+        else { a.misses[code] = (a.misses[code] || 0) + 1; a.queue.push(code); }
+        if (a.queue.length) save(allKey(), a); else drop(allKey());
+      } else state.results.push({ c: code, ok, picked: c, ms, topic: tp });
+      state.lastMs = ms;
+    }
+    app.querySelectorAll('#options [data-c]').forEach(b => {
+      const k = b.dataset.c;
+      b.disabled = true;
+      if (k === code) { b.classList.add('right'); b.insertAdjacentHTML('beforeend', '<span class="badge" aria-hidden="true">✓</span>'); }
+      else if (k === c) { b.classList.add('wrong'); b.insertAdjacentHTML('beforeend', '<span class="badge" aria-hidden="true">✕</span>'); }
+      else b.classList.add('dim');
+      if (!ok) b.classList.add('revealed');
+    });
+    const hudEl = app.querySelector('.hud'); if (hudEl) { state.view = 'answered'; hudEl.outerHTML = hud(); }
+    const fb = document.getElementById('feedback');
+    if (tp === 'cities') {
+      const city = BY[code], km = Math.round(c.km), near = NEAR_KM[city.r];
+      drawCityResult(city, c, ok);
+      const fin = state.game === 'all' ? !state.all.queue.length : state.qIndex === PER_LEVEL - 1 || (state.game === 'tour' && state.qIndex === 9);
+      const facts = `<b>${esc(nm(code))}</b> · ${esc(nm(city.cc))} · ${esc(rg(city.r))}`;
+      if (ok) {
+        const quick = state.lastMs < QUICK_MS ? `<span class="quick">${bolt}${l.quick}</span>` : '';
+        fb.innerHTML = `<div class="msg"><span class="verdict ok">${km <= near / 3 ? l.bullseye : l.closeEnough} ${quick}</span><span class="facts">${l.kmAway(km)} · ${facts}</span></div>`;
+        if (!replaying) { if (state.look === 'playful') confetti(document.getElementById('citymap')); state.timer = setTimeout(advance, 1300); }
+      } else {
+        fb.innerHTML = `<div class="msg"><span class="verdict no">${l.kmAway(km)}</span><span class="facts">${l.within(near)} · ${facts}</span></div><button class="primary" id="next-btn">${fin ? l.results : l.next}</button>`;
+        const next = document.getElementById('next-btn'); next.onclick = advance; next.focus({ preventScroll: true });
+      }
+      return;
+    }
+    const finished = state.game === 'all' ? !state.all.queue.length : state.qIndex === PER_LEVEL - 1;
+    const cap = capOf(code);
+    if (ok) {
+      const quick = state.lastMs < QUICK_MS ? `<span class="quick">${bolt}${l.quick}</span>` : '';
+      const fact = tp === 'capitals' ? `${esc(nm(code))} · ${l.capital} ${esc(cap)}` : `${esc(nm(code))}${cap ? ` · ${l.capital} ${esc(cap)}` : ''}`;
+      fb.innerHTML = `<div class="msg"><span class="verdict ok">${pick(l.correct)} ${quick}</span><span class="facts">${fact}</span></div>`;
+      if (!replaying) {
+        if (state.look === 'playful') confetti(app.querySelector('#options .right'));
+        state.timer = setTimeout(advance, AUTO_NEXT_MS);
+      }
+    } else {
+      const facts = `<b>${esc(nm(code))}</b>${cap ? ` · ${l.capital} ${esc(cap)}` : ''} · ${esc(rg(BY[code].r))}`;
+      let verdict;
+      if (tp === 'capitals') verdict = l.capWrong(esc(capOf(c)), esc(nm(c)));
+      else verdict = MD() === 'find' ? l.pickedFlag(esc(nm(c))) : l.notQuite(esc(nm(code)), tp);
+      fb.innerHTML = `<div class="msg"><span class="verdict no">${verdict}</span><span class="facts">${facts}</span></div><button class="primary" id="next-btn">${finished ? l.results : l.next}</button>`;
+      const next = document.getElementById('next-btn');
+      next.onclick = advance; next.focus({ preventScroll: true });
+    }
+  }
+
+  function advance() {
+    clearTimeout(state.timer);
+    if (state.game === 'all') return state.all.queue.length ? nextQuestion() : renderAllDone();
+    if (state.game === 'tour') { if (state.qIndex < 9) { state.qIndex++; return nextQuestion(); } return renderTourDone(); }
+    if (state.qIndex < PER_LEVEL - 1) { state.qIndex++; nextQuestion(); }
+    else renderSummary();
+  }
+
+  const reviewCard = (c, note) => {
+    if (BY[c] && BY[c].cc) return `<div class="card">${flag(BY[c].cc)}${esc(nm(c))}<span>${esc(nm(BY[c].cc))}${note ? ' · ' + note : ''}</span></div>`;
+    const o = TP() === 'capitals' ? `${esc(nm(c))}<span>${esc(capOf(c))}</span>` : esc(nm(c));
+    return `<div class="card">${TP() === 'shapes' ? shape(c, 'mini') : flag(c)}${o}${note ? `<span>${note}</span>` : ''}</div>`;
+  };
+
+  function renderSummary() {
+    state.view = 'summary';
+    const l = L();
+    const right = state.results.filter(r => r.ok), n = right.length;
+    const stars = n >= 10 ? 3 : n >= 8 ? 2 : n >= 5 ? 1 : 0;
+    const misses = state.results.filter(r => !r.ok);
+    const avg = n ? right.reduce((s, r) => s + r.ms, 0) / n : null;
+    const fastest = n ? right.reduce((a, b) => (b.ms < a.ms ? b : a)) : null;
+    const quickCount = right.filter(r => r.ms < QUICK_MS).length;
+    const key = `geo-best-${TP()}-${MD()}-${RG()}-${state.level}`;
+    if (!state.pb || state.pb.round !== state.results) {
+      const best = load(key, null);
+      const isNew = n > 0 && (!best || n > best.n || (n === best.n && avg < best.avg));
+      if (isNew) save(key, { n, avg });
+      state.pb = { round: state.results, best, isNew };
+    }
+    const { best, isNew } = state.pb;
+    const pbLine = isNew ? (best ? l.pbNew(best.n, secs(best.avg)) : l.pbFirst) : best ? l.pbOld(best.n, secs(best.avg)) : '';
+    const title = n === 10 ? l.perfect : n >= 8 ? l.great : n >= 5 ? l.nice : l.practice;
+    const pickedName = c => TP() === 'capitals' && MD() === 'find' ? capOf(c) : nm(c);
+    app.innerHTML = `${header(true)}${hud()}
+      <div class="panel summary enter">
+        <div class="stars">${star(stars >= 1)}${star(stars >= 2)}${star(stars >= 3)}</div>
+        <h2>${title}</h2>
+        <div class="stats">
+          <div class="stat"><b>${n}/${PER_LEVEL}</b><span>${l.rightOn(state.level)}</span></div>
+          <div class="stat"><b>${avg ? secs(avg) : '–'}</b><span>${l.avg}</span></div>
+          <div class="stat"><b>${fastest ? secs(fastest.ms) : '–'}</b><span>${fastest ? esc(l.quickest(nm(fastest.c))) : l.quickestBare}</span></div>
+        </div>
+        <div class="pb ${isNew ? 'new' : ''}">${pbLine}${quickCount ? ` · ${l.quickCount(quickCount)}` : ''}</div>
+        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => reviewCard(m.c, TP() === 'cities' ? l.kmAway(Math.round(m.picked.km)) : esc(l.youPicked(pickedName(m.picked))))).join('')}</div>` : ''}
+        <div class="btn-row">
+          ${state.level === LEVELS ? (suggestNext() ? `<button class="primary" id="sug-btn">${esc(suggestLabel(suggestNext()))}</button><button class="ghost" id="again-btn">${l.again}</button>` : `<button class="primary" id="again-btn">${l.again}</button>`) : `<button class="primary" id="next-level">${l.nextLevel(state.level + 1)}</button>`}
+          <button class="ghost" id="replay">${l.replay(state.level)}</button>
+        </div>
+      </div>`;
+    wireHeader();
+    document.getElementById('replay').onclick = () => startLevel(state.level, false);
+    const nl = document.getElementById('next-level'); if (nl) nl.onclick = () => startLevel(state.level + 1, false);
+    const ag = document.getElementById('again-btn'); if (ag) ag.onclick = () => startLevel(1, true);
+    const sb4 = document.getElementById('sug-btn'); if (sb4) sb4.onclick = () => playSuggestion(suggestNext());
+    if (state.look === 'playful' && stars >= 2 && !state.pb.celebrated) { state.pb.celebrated = true; confetti(app.querySelector('.stars'), 120); }
+  }
+
+  function renderAllDone() {
+    const first = state.view !== 'allDone';
+    state.view = 'allDone';
+    const l = L(), a = state.all;
+    const tricky = Object.entries(a.misses).sort((x, y) => y[1] - x[1]);
+    const sugA = suggestNext();
+    const top = tricky[0];
+    app.innerHTML = `${header(true)}${hud()}
+      <div class="panel summary enter">
+        <div class="stars">${star(true)}${star(true)}${star(true)}</div>
+        <h2>${l.allDone(a.total, l.noun[TP()])}</h2>
+        <div class="stats">
+          <div class="stat"><b>${a.firstTry}/${a.total}</b><span>${l.firstTry}</span></div>
+          <div class="stat"><b>${a.answers}</b><span>${l.answers}</span></div>
+          <div class="stat"><b>${top ? esc(nm(top[0])) : l.none}</b><span>${top ? `${l.trickiest} · ${l.tries(top[1] + 1)}` : l.trickiest}</span></div>
+        </div>
+        ${tricky.length ? `<div class="label">${l.review}</div><div class="review">${tricky.slice(0, 24).map(([c, k]) => reviewCard(c, '× ' + k)).join('')}</div>` : ''}
+        <div class="btn-row">${sugA ? `<button class="primary" id="sug-btn">${esc(suggestLabel(sugA))}</button>` : ''}<button class="ghost" id="other-btn">${l.otherGame}</button><button class="ghost" id="again-all">${l.playAgain}</button></div>
+      </div>`;
+    wireHeader();
+    document.getElementById('again-all').onclick = () => startAll(false);
+    document.getElementById('other-btn').onclick = renderHome;
+    const sb3 = document.getElementById('sug-btn'); if (sb3) sb3.onclick = () => playSuggestion(sugA);
+    if (first && state.look === 'playful') confetti(app.querySelector('.stars'), 160);
+  }
+
+  // ---------- confetti (playful theme) ----------
+  const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
+  let parts = [], raf = null;
+  function confetti(el, count) {
+    if (reduceMotion || !el) return;
+    const r = el.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const colors = ['#ffd23f', '#ff5d73', '#22b573', '#3eaee8', '#a66cff', '#ff9f1c'];
+    for (let i = 0; i < (count || 45); i++) {
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 5 + Math.random() * 7;
+      parts.push({ x: r.left + r.width / 2, y: r.top + r.height / 2, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, s: 5 + Math.random() * 6, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4, c: pick(colors), life: 0 });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+  function tick() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.life < 70 && p.y < innerHeight + 20);
+    for (const p of parts) {
+      p.life++; p.vy += 0.32; p.vx *= 0.98; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.globalAlpha = Math.max(0, 1 - p.life / 70);
+      cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.66); cx.restore();
+    }
+    raf = parts.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, innerWidth, innerHeight), null);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (state.view === 'question' && !state.answered && /^[1-6]$/.test(e.key)) {
+      const b = document.getElementById('opt-' + e.key); if (b) { b.click(); e.preventDefault(); }
+    }
+  });
+
+  renderHome();
+})();
+</script>
+</body>
+</html>

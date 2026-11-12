@@ -1,0 +1,80 @@
+IT|Milan|2
+IT|Naples|2
+IT|Turin|3
+IT|Florence|2
+IT|Venice|2
+ES|Barcelona|2
+ES|Seville|3
+ES|Valencia|3
+PT|Porto|3
+FR|Marseille|2
+FR|Lyon|3
+FR|Nice|3
+DE|Munich|2
+DE|Hamburg|3
+DE|Frankfurt|3
+DE|Cologne|3
+CH|Zurich|2
+CH|Geneva|2
+GB|Manchester|2
+GB|Liverpool|3
+GB|Edinburgh|2
+GB|Glasgow|3
+GB|Birmingham|3
+TR|Istanbul|1
+RU|St. Petersburg|2
+PL|Krakow|3
+NL|Rotterdam|3
+BE|Antwerp|4
+SE|Gothenburg|4
+CN|Shanghai|2
+CN|Guangzhou|4
+CN|Shenzhen|4
+CN|Hong Kong|2
+JP|Osaka|3
+JP|Kyoto|3
+IN|Mumbai|2
+IN|Kolkata|3
+IN|Bangalore|3
+IN|Chennai|4
+PK|Karachi|3
+PK|Lahore|4
+VN|Ho Chi Minh City|3
+AE|Dubai|2
+SA|Jeddah|4
+SA|Mecca|3
+KZ|Almaty|4
+KR|Busan|4
+NG|Lagos|3
+ZA|Johannesburg|2
+ZA|Cape Town|2
+ZA|Durban|4
+MA|Casablanca|3
+MA|Marrakesh|3
+EG|Alexandria|3
+KE|Mombasa|4
+US|New York|1
+US|Los Angeles|1
+US|Chicago|2
+US|San Francisco|2
+US|Miami|2
+US|Houston|3
+US|Seattle|3
+US|Boston|3
+US|Las Vegas|3
+US|New Orleans|4
+CA|Toronto|2
+CA|Montreal|3
+CA|Vancouver|3
+MX|Guadalajara|4
+BR|Sao Paulo|2
+BR|Rio de Janeiro|1
+BR|Salvador|4
+AR|Cordoba|4
+CO|Medellin|4
+EC|Guayaquil|4
+AU|Sydney|1
+AU|Melbourne|2
+AU|Brisbane|3
+AU|Perth|3
+NZ|Auckland|2
