@@ -1,0 +1,104 @@
+# id|Name|Nome|CODE|Place|Luogo|lat|lon|tier|kind
+# tier: 1 = world famous ... 4 = harder. kind picks the little icon.
+eiffel-tower|Eiffel Tower|Torre Eiffel|FR|Paris|Parigi|48.8584|2.2945|1|tower
+versailles|Palace of Versailles|Reggia di Versailles|FR|Versailles|Versailles|48.8049|2.1204|2|palace
+mont-saint-michel|Mont-Saint-Michel|Mont-Saint-Michel|FR|Normandy|Normandia|48.6361|-1.5115|3|church
+colosseum|Colosseum|Colosseo|IT|Rome|Roma|41.8902|12.4922|1|ruins
+leaning-tower|Leaning Tower of Pisa|Torre di Pisa|IT|Pisa|Pisa|43.7230|10.3966|1|tower
+st-marks|St Mark's Basilica|Basilica di San Marco|IT|Venice|Venezia|45.4345|12.3397|2|church
+pompeii|Pompeii|Pompei|IT|near Naples|vicino a Napoli|40.7489|14.4848|2|ruins
+milan-cathedral|Milan Cathedral|Duomo di Milano|IT|Milan|Milano|45.4642|9.1919|2|church
+tre-cime|Tre Cime di Lavaredo|Tre Cime di Lavaredo|IT|Dolomites|Dolomiti|46.6187|12.3027|4|mountain
+st-peters|St Peter's Basilica|Basilica di San Pietro|VA|Vatican City|Città del Vaticano|41.9022|12.4539|2|church
+sagrada-familia|Sagrada Família|Sagrada Família|ES|Barcelona|Barcellona|41.4036|2.1744|1|church
+alhambra|Alhambra|Alhambra|ES|Granada|Granada|37.1761|-3.5881|2|palace
+big-ben|Big Ben|Big Ben|GB|London|Londra|51.5007|-0.1246|1|tower
+tower-bridge|Tower Bridge|Tower Bridge|GB|London|Londra|51.5055|-0.0754|2|bridge
+stonehenge|Stonehenge|Stonehenge|GB|Wiltshire|Wiltshire|51.1789|-1.8262|2|ruins
+edinburgh-castle|Edinburgh Castle|Castello di Edimburgo|GB-SCT|Edinburgh|Edimburgo|55.9486|-3.1999|3|palace
+giants-causeway|Giant's Causeway|Selciato del gigante|GB|Northern Ireland|Irlanda del Nord|55.2408|-6.5116|3|nature
+brandenburg-gate|Brandenburg Gate|Porta di Brandeburgo|DE|Berlin|Berlino|52.5163|13.3777|2|monument
+neuschwanstein|Neuschwanstein Castle|Castello di Neuschwanstein|DE|Bavaria|Baviera|47.5576|10.7498|2|palace
+cologne-cathedral|Cologne Cathedral|Duomo di Colonia|DE|Cologne|Colonia|50.9413|6.9583|3|church
+matterhorn|Matterhorn|Cervino|CH|Zermatt|Zermatt|45.9763|7.6586|2|mountain
+acropolis|Acropolis of Athens|Acropoli di Atene|GR|Athens|Atene|37.9715|23.7257|1|ruins
+st-basils|St Basil's Cathedral|Cattedrale di San Basilio|RU|Moscow|Mosca|55.7525|37.6231|1|church
+hagia-sophia|Hagia Sophia|Santa Sofia|TR|Istanbul|Istanbul|41.0086|28.9802|2|temple
+cappadocia|Cappadocia|Cappadocia|TR|central Turkey|Turchia centrale|38.6431|34.8289|3|nature
+charles-bridge|Charles Bridge|Ponte Carlo|CZ|Prague|Praga|50.0865|14.4114|3|bridge
+atomium|Atomium|Atomium|BE|Brussels|Bruxelles|50.8949|4.3415|3|monument
+little-mermaid|The Little Mermaid|La Sirenetta|DK|Copenhagen|Copenaghen|55.6929|12.5993|3|statue
+geirangerfjord|Geirangerfjord|Geirangerfjord|NO|western Norway|Norvegia occidentale|62.1049|7.0940|4|nature
+gullfoss|Gullfoss|Gullfoss|IS|southern Iceland|Islanda meridionale|64.3271|-20.1199|4|waterfall
+belem-tower|Belém Tower|Torre di Belém|PT|Lisbon|Lisbona|38.6916|-9.2160|3|tower
+dubrovnik|Old Town of Dubrovnik|Città vecchia di Dubrovnik|HR|Dubrovnik|Dubrovnik|42.6407|18.1077|3|wall
+plitvice|Plitvice Lakes|Laghi di Plitvice|HR|central Croatia|Croazia centrale|44.8654|15.5820|4|waterfall
+schonbrunn|Schönbrunn Palace|Castello di Schönbrunn|AT|Vienna|Vienna|48.1845|16.3122|3|palace
+kinderdijk|Kinderdijk Windmills|Mulini di Kinderdijk|NL|near Rotterdam|vicino a Rotterdam|51.8846|4.6390|4|monument
+taj-mahal|Taj Mahal|Taj Mahal|IN|Agra|Agra|27.1751|78.0421|1|palace
+golden-temple|Golden Temple|Tempio d'oro|IN|Amritsar|Amritsar|31.6200|74.8765|4|temple
+great-wall|Great Wall of China|Grande Muraglia cinese|CN|Badaling, near Beijing|Badaling, vicino a Pechino|40.3588|116.0200|1|wall
+forbidden-city|Forbidden City|Città Proibita|CN|Beijing|Pechino|39.9163|116.3972|2|palace
+terracotta-army|Terracotta Army|Esercito di terracotta|CN|Xi'an|Xi'an|34.3841|109.2785|2|statue
+potala-palace|Potala Palace|Palazzo del Potala|CN|Lhasa|Lhasa|29.6578|91.1170|3|palace
+mount-fuji|Mount Fuji|Monte Fuji|JP|Honshu|Honshu|35.3606|138.7274|1|mountain
+himeji-castle|Himeji Castle|Castello di Himeji|JP|Himeji|Himeji|34.8394|134.6939|4|palace
+gyeongbokgung|Gyeongbokgung Palace|Palazzo Gyeongbokgung|KR|Seoul|Seul|37.5796|126.9770|4|palace
+taipei-101|Taipei 101|Taipei 101|TW|Taipei|Taipei|25.0340|121.5645|3|tower
+angkor-wat|Angkor Wat|Angkor Wat|KH|Siem Reap|Siem Reap|13.4125|103.8670|2|temple
+ha-long-bay|Ha Long Bay|Baia di Ha Long|VN|northern Vietnam|Vietnam settentrionale|20.9101|107.1839|3|nature
+shwedagon|Shwedagon Pagoda|Pagoda Shwedagon|MM|Yangon|Yangon|16.7983|96.1497|4|temple
+petronas-towers|Petronas Towers|Torri Petronas|MY|Kuala Lumpur|Kuala Lumpur|3.1579|101.7116|3|tower
+marina-bay-sands|Marina Bay Sands|Marina Bay Sands|SG|Singapore|Singapore|1.2834|103.8607|3|building
+borobudur|Borobudur|Borobudur|ID|Java|Giava|-7.6079|110.2038|3|temple
+petra|Petra|Petra|JO|southern Jordan|Giordania meridionale|30.3285|35.4444|2|ruins
+burj-khalifa|Burj Khalifa|Burj Khalifa|AE|Dubai|Dubai|25.1972|55.2744|2|tower
+sheikh-zayed-mosque|Sheikh Zayed Grand Mosque|Grande Moschea dello Sceicco Zayed|AE|Abu Dhabi|Abu Dhabi|24.4128|54.4750|4|temple
+everest|Mount Everest|Monte Everest|NP|Nepal–China border|confine tra Nepal e Cina|27.9881|86.9250|1|mountain
+registan|Registan|Registan|UZ|Samarkand|Samarcanda|39.6547|66.9758|4|monument
+giza-pyramids|Pyramids of Giza|Piramidi di Giza|EG|Giza, near Cairo|Giza, vicino al Cairo|29.9792|31.1342|1|pyramid
+abu-simbel|Abu Simbel|Abu Simbel|EG|southern Egypt|Egitto meridionale|22.3372|31.6258|3|ruins
+kilimanjaro|Mount Kilimanjaro|Kilimangiaro|TZ|northern Tanzania|Tanzania settentrionale|-3.0674|37.3556|2|mountain
+serengeti|Serengeti|Serengeti|TZ|northern Tanzania|Tanzania settentrionale|-2.3333|34.8333|3|nature
+victoria-falls|Victoria Falls|Cascate Vittoria|ZW|Zambia–Zimbabwe border|confine tra Zambia e Zimbabwe|-17.9243|25.8572|2|waterfall
+great-zimbabwe|Great Zimbabwe|Grande Zimbabwe|ZW|near Masvingo|vicino a Masvingo|-20.2674|30.9338|4|ruins
+table-mountain|Table Mountain|Table Mountain|ZA|Cape Town|Città del Capo|-33.9628|18.4098|2|mountain
+djenne-mosque|Great Mosque of Djenné|Grande Moschea di Djenné|ML|Djenné|Djenné|13.9053|-4.5555|4|temple
+lalibela|Rock-hewn churches of Lalibela|Chiese rupestri di Lalibela|ET|Lalibela|Lalibela|12.0317|39.0476|4|church
+okavango|Okavango Delta|Delta dell'Okavango|BW|northern Botswana|Botswana settentrionale|-19.2833|22.9000|4|nature
+hassan-ii-mosque|Hassan II Mosque|Moschea di Hassan II|MA|Casablanca|Casablanca|33.6086|-7.6327|4|temple
+baobabs|Avenue of the Baobabs|Viale dei Baobab|MG|near Morondava|vicino a Morondava|-20.2509|44.4183|4|nature
+sossusvlei|Sossusvlei dunes|Dune di Sossusvlei|NA|Namib Desert|Deserto del Namib|-24.7275|15.3433|4|nature
+statue-of-liberty|Statue of Liberty|Statua della Libertà|US|New York|New York|40.6892|-74.0445|1|statue
+golden-gate|Golden Gate Bridge|Golden Gate Bridge|US|San Francisco|San Francisco|37.8199|-122.4783|1|bridge
+grand-canyon|Grand Canyon|Grand Canyon|US|Arizona|Arizona|36.1069|-112.1129|1|nature
+mount-rushmore|Mount Rushmore|Monte Rushmore|US|South Dakota|Dakota del Sud|43.8791|-103.4591|2|monument
+white-house|White House|Casa Bianca|US|Washington, D.C.|Washington|38.8977|-77.0365|2|building
+hollywood-sign|Hollywood Sign|Scritta Hollywood|US|Los Angeles|Los Angeles|34.1341|-118.3215|2|monument
+old-faithful|Old Faithful, Yellowstone|Old Faithful, Yellowstone|US|Wyoming|Wyoming|44.4605|-110.8281|3|nature
+space-needle|Space Needle|Space Needle|US|Seattle|Seattle|47.6205|-122.3493|3|tower
+niagara-falls|Niagara Falls|Cascate del Niagara|CA|Canada–US border|confine tra Canada e Stati Uniti|43.0799|-79.0747|2|waterfall
+cn-tower|CN Tower|CN Tower|CA|Toronto|Toronto|43.6426|-79.3871|3|tower
+moraine-lake|Moraine Lake|Lago Moraine|CA|Banff, Rocky Mountains|Banff, Montagne Rocciose|51.3217|-116.1860|4|nature
+ilulissat-icefjord|Ilulissat Icefjord|Fiordo ghiacciato di Ilulissat|GL|western Greenland|Groenlandia occidentale|69.1700|-50.5000|4|nature
+chichen-itza|Chichén Itzá|Chichén Itzá|MX|Yucatán|Yucatán|20.6843|-88.5678|2|pyramid
+teotihuacan|Teotihuacan|Teotihuacan|MX|near Mexico City|vicino a Città del Messico|19.6925|-98.8438|3|pyramid
+tikal|Tikal|Tikal|GT|northern Guatemala|Guatemala settentrionale|17.2220|-89.6237|4|pyramid
+panama-canal|Panama Canal|Canale di Panama|PA|Panama|Panama|8.9970|-79.5915|3|canal
+el-morro|Morro Castle|Castello del Morro|CU|Havana|L'Avana|23.1500|-82.3567|4|palace
+machu-picchu|Machu Picchu|Machu Picchu|PE|Andes, near Cusco|Ande, vicino a Cusco|-13.1631|-72.5450|1|ruins
+nazca-lines|Nazca Lines|Linee di Nazca|PE|southern Peru|Perù meridionale|-14.7390|-75.1300|3|monument
+christ-the-redeemer|Christ the Redeemer|Cristo Redentore|BR|Rio de Janeiro|Rio de Janeiro|-22.9519|-43.2105|1|statue
+iguazu-falls|Iguazu Falls|Cascate dell'Iguazú|AR|Argentina–Brazil border|confine tra Argentina e Brasile|-25.6953|-54.4367|2|waterfall
+perito-moreno|Perito Moreno Glacier|Ghiacciaio Perito Moreno|AR|Patagonia|Patagonia|-50.4967|-73.1377|3|nature
+angel-falls|Angel Falls|Salto Angel|VE|south-eastern Venezuela|Venezuela sud-orientale|5.9701|-62.5362|3|waterfall
+galapagos|Galápagos Islands|Isole Galápagos|EC|Pacific Ocean|Oceano Pacifico|-0.9538|-90.9656|2|nature
+easter-island|Easter Island moai|Moai dell'Isola di Pasqua|CL|Pacific Ocean|Oceano Pacifico|-27.1127|-109.3497|2|statue
+torres-del-paine|Torres del Paine|Torres del Paine|CL|Patagonia|Patagonia|-50.9423|-73.4068|4|mountain
+salar-de-uyuni|Salar de Uyuni|Salar de Uyuni|BO|south-western Bolivia|Bolivia sud-occidentale|-20.1338|-67.4891|3|nature
+sydney-opera-house|Sydney Opera House|Teatro dell'Opera di Sydney|AU|Sydney|Sydney|-33.8568|151.2153|1|building
+uluru|Uluru|Uluru|AU|Northern Territory|Territorio del Nord|-25.3444|131.0369|2|mountain
+great-barrier-reef|Great Barrier Reef|Grande barriera corallina|AU|Queensland coast|costa del Queensland|-18.2871|147.6992|2|nature
+twelve-apostles|Twelve Apostles|Dodici Apostoli|AU|Victoria|Victoria|-38.6650|143.1050|4|nature
+milford-sound|Milford Sound|Milford Sound|NZ|Fiordland|Fiordland|-44.6414|167.8974|3|nature
+aoraki|Aoraki / Mount Cook|Aoraki / Monte Cook|NZ|Southern Alps|Alpi meridionali|-43.5950|170.1418|4|mountain

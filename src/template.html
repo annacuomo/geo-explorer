@@ -320,6 +320,8 @@ body[data-look="playful"] .stamps-link { font-weight: 600; }
 .pp-empty { flex: 1; display: grid; place-items: center; align-content: center; gap: 8px; color: #b9a68b; min-height: 300px; font-size: 15px; }
 .pp-empty svg { width: 120px; height: 120px; }
 /* ---------- cities map ---------- */
+.lm-icon { width: 76px; height: 76px; border-radius: 50%; background: var(--paper); color: var(--ink); display: grid; place-items: center; box-shadow: 0 0 0 3px var(--ink), 0 5px 0 rgba(42, 127, 192, 0.35); margin-bottom: 8px; }
+.lm-icon svg { width: 48px; height: 48px; }
 .city-q { gap: 2px; }
 .city-hint { display: inline-flex; align-items: center; gap: 8px; font-size: 16px !important; }
 img.flag.tiny { width: 28px; }
@@ -426,6 +428,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
 <script id="shape-data" type="application/json">__SHAPES__</script>
 <script id="world-data" type="application/json">__WORLD__</script>
 <script id="city-data" type="application/json">__CITIES__</script>
+<script id="landmark-data" type="application/json">__LANDMARKS__</script>
 <script>
 (function () {
   // Flags: flag-icons by Panayiotis Lipiridis and contributors (MIT licence), embedded as SVG.
@@ -441,6 +444,10 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
   // Cities: Natural Earth populated places (public domain); each city gets its own key in BY
   const CITY_SET = JSON.parse(document.getElementById('city-data').textContent).map(x => ({ c: x.id, n: x.n, ni: x.ni, cap: '', capi: '', r: x.r, t: x.t, cc: x.cc, lat: x.lat, lon: x.lon, isCap: !!x.cap }));
   for (const x of CITY_SET) BY[x.c] = x;
+  // Landmarks: hand-made list (data/landmarks.txt), checked by scripts/build_landmarks.py
+  const LANDMARK_SET = JSON.parse(document.getElementById('landmark-data').textContent).map(x => ({ c: x.id, n: x.n, ni: x.ni, cap: '', capi: '', r: x.r, t: x.t, cc: x.cc, lat: x.lat, lon: x.lon, place: x.p, placeIt: x.pi, kind: x.k }));
+  for (const x of LANDMARK_SET) BY[x.c] = x;
+  const ONMAP = tp => tp === 'cities' || tp === 'landmarks';
   const shape = (c, cls) => `<svg class="shape ${cls || ''}" viewBox="0 0 100 100" aria-hidden="true"><path d="${SHAPES.paths[c]}" fill-rule="evenodd"/></svg>`;
 
   const REGIONS = ['World', 'Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania'];
@@ -461,7 +468,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       backSite: 'More projects by Anna Cuomo',
       home: 'Home', myStamps: (n, N) => `My stamps · ${n} of ${N}`, stampsTitle: 'My stamps',
       tourTitle: "Today's world tour", tourSub: 'Ten questions, a little of everything. Take as long as you like.', tourLabel: "Today's tour",
-      mixN: (n, tp) => `${n} ${{ flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities' }[tp]}`,
+      mixN: (n, tp) => `${n} ${{ flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities', landmarks: 'landmark' }[tp]}`,
       playTour: "Play today's tour", tourAgain: 'Play the tour again', sameForAll: 'Same questions for everyone today', tourDoneNote: n => `Done today: ${n}/10. A new tour tomorrow.`,
       tourDoneTitle: n => n === 10 ? 'A perfect tour!' : n >= 7 ? 'Lovely trip!' : 'Tour complete', tourRight: 'right today', tomorrow: 'Tomorrow', tomorrowNote: 'a brand-new tour', backHome: 'Back home',
       globeLabel: 'A globe you can drag to spin', dragSpin: 'Drag to spin', orPlay: 'Or play one game', learnedN: (n, N) => `${n} of ${N} learned`,
@@ -469,15 +476,16 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       fotd: 'Flag of the day', whoseToday: 'Whose flag is this?', reveal: 'Reveal', mixUp: 'Easy to mix up with', practise: r => `Practise ${r}`,
       passport: 'Passport', holder: 'Holder', namePh: 'Your name', stampsCount: (n, N) => `<b>${n}</b> of ${N} stamps`, chooseGame: 'Choose a game',
       stampsFor: g => `Stamps · ${g}`, stampHint: 'Learn every one in a region to earn its stamp. Tap a stamp to practise that region.', learnedOf: (n, N) => `${n}/${N}`,
-      credits: 'Flags from flag-icons (MIT). Outlines from mledoze/countries (ODbL), based on Natural Earth. City locations from Natural Earth (public domain).',
+      credits: 'Flags from flag-icons (MIT). Outlines from mledoze/countries (ODbL), based on Natural Earth. City locations from Natural Earth (public domain). Landmark list made for this game.',
       cities: 'Cities', citiesDesc: 'Find cities on the map: get as close as you can.',
+      kinds: { tower: 'A tower', church: 'A church or cathedral', ruins: 'Ancient ruins', palace: 'A palace or castle', bridge: 'A bridge', statue: 'A statue', mountain: 'A mountain', waterfall: 'A waterfall', nature: 'A natural wonder', monument: 'A monument', temple: 'A temple, mosque or pagoda', pyramid: 'Pyramids', wall: 'Ancient walls', building: 'A famous building', canal: 'A canal' },
       capitalOf: c => `Capital of ${c}`, cityIn: c => `A city in ${c}`, kmAway: k => `${k.toLocaleString('en-GB')} km away`, bullseye: 'Bullseye!', closeEnough: 'Close enough!',
       within: k => `Within ${k} km counts as right`, mapLabel: r => `Map of ${r}: click where you think the city is`,
       landmarks: 'Landmarks', landmarksDesc: 'Find the Eiffel Tower, Machu Picchu and friends on the map.',
-      noun: { flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities' }, Noun: { flags: 'Flags', capitals: 'Capitals', shapes: 'Shapes', cities: 'Cities' },
-      howTo: 'How to play', levelsMode: 'Five levels', allMode: { flags: 'Every flag, until you know them all', capitals: 'Every capital, until you know them all', shapes: 'Every shape, until you know them all', cities: 'Every city, until you know them all' },
+      noun: { flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities', landmarks: 'landmarks' }, Noun: { flags: 'Flags', capitals: 'Capitals', shapes: 'Shapes', cities: 'Cities', landmarks: 'Landmarks' },
+      howTo: 'How to play', levelsMode: 'Five levels', allMode: { flags: 'Every flag, until you know them all', capitals: 'Every capital, until you know them all', shapes: 'Every shape, until you know them all', cities: 'Every city, until you know them all', landmarks: 'Every landmark, until you know them all' },
       options: 'Options', change: 'Change',
-      qStyle: 'Question style', styles: { flags: { find: 'Pick the flag', name: 'Name the flag' }, capitals: { find: 'Pick the capital', name: 'Name the country' }, shapes: { find: 'Pick the shape', name: 'Name the country' }, cities: { find: 'Find it on the map', name: 'Find it on the map' } },
+      qStyle: 'Question style', styles: { flags: { find: 'Pick the flag', name: 'Name the flag' }, capitals: { find: 'Pick the capital', name: 'Name the country' }, shapes: { find: 'Pick the shape', name: 'Name the country' }, cities: { find: 'Find it on the map', name: 'Find it on the map' }, landmarks: { find: 'Find it on the map', name: 'Find it on the map' } },
       region: 'Region', theme: 'Theme', playful: 'Playful', calm: 'Calm night',
       regions: { World: 'World', Europe: 'Europe', Asia: 'Asia', Africa: 'Africa', 'North America': 'North America', 'South America': 'South America', Oceania: 'Oceania' },
       noteLevels: noun => `No clock on screen, no rush. Five levels of ${PER_LEVEL} ${noun}, getting gradually harder. Get one wrong and you'll see what every option was. At the end of each level you'll see how quick you were, if you're curious.`,
@@ -485,7 +493,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       startLevels: 'Start level 1', startAll: 'Start', resume: (d, n) => `Carry on (${d} of ${n} done)`, restart: 'Start over',
       learned: (Noun, n, N) => `${Noun} you've got right so far: <b>${n}</b> of ${N}`,
       level: 'Level', only: r => `${r} only`,
-      ask: { flags: { find: 'Which flag belongs to', name: 'Whose flag is this?' }, capitals: { find: 'What is the capital of', name: 'Which country has this capital?' }, shapes: { find: 'Which shape is', name: 'Which country is this?' }, cities: { find: 'Where is', name: 'Where is' } },
+      ask: { flags: { find: 'Which flag belongs to', name: 'Whose flag is this?' }, capitals: { find: 'What is the capital of', name: 'Which country has this capital?' }, shapes: { find: 'Which shape is', name: 'Which country is this?' }, cities: { find: 'Where is', name: 'Where is' }, landmarks: { find: 'Where is', name: 'Where is' } },
       idle: 'Take your time. You can also press <span class="kbd">1</span>–<span class="kbd">6</span> to choose.',
       correct: ['Correct!', 'Spot on!', 'Well done!', 'Yes, that’s it!'], quick: 'Quick!', capital: 'capital',
       pickedFlag: n => `That one is ${n}`, notQuite: (n, tp) => tp === 'flags' ? `Not quite. This is the flag of ${n}` : `Not quite. This is ${n}`,
@@ -512,7 +520,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       backSite: 'Altri progetti di Anna Cuomo',
       home: 'Home', myStamps: (n, N) => `I miei timbri · ${n} su ${N}`, stampsTitle: 'I miei timbri',
       tourTitle: 'Il giro del mondo di oggi', tourSub: 'Dieci domande, un po\' di tutto. Prenditi tutto il tempo che vuoi.', tourLabel: 'Giro di oggi',
-      mixN: (n, tp) => `${n} ${{ flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città' }[tp]}`,
+      mixN: (n, tp) => `${n} ${{ flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città', landmarks: 'meraviglia' }[tp]}`,
       playTour: 'Gioca il giro di oggi', tourAgain: 'Rifai il giro', sameForAll: 'Oggi le stesse domande per tutti', tourDoneNote: n => `Fatto oggi: ${n}/10. Domani un giro nuovo.`,
       tourDoneTitle: n => n === 10 ? 'Giro perfetto!' : n >= 7 ? 'Bel viaggio!' : 'Giro completato', tourRight: 'giuste oggi', tomorrow: 'Domani', tomorrowNote: 'un giro tutto nuovo', backHome: 'Torna alla home',
       globeLabel: 'Un mappamondo da far girare', dragSpin: 'Trascina per girare', orPlay: 'Oppure scegli un gioco', learnedN: (n, N) => `${n} su ${N} imparate`,
@@ -520,15 +528,16 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       fotd: 'Bandiera del giorno', whoseToday: 'Di chi è questa bandiera?', reveal: 'Scopri', mixUp: 'Facile da confondere con', practise: r => `Allenati: ${r}`,
       passport: 'Passaporto', holder: 'Titolare', namePh: 'Il tuo nome', stampsCount: (n, N) => `<b>${n}</b> timbri su ${N}`, chooseGame: 'Scegli un gioco',
       stampsFor: g => `Timbri · ${g}`, stampHint: 'Impara tutte le risposte di una regione per avere il suo timbro. Tocca un timbro per allenarti su quella regione.', learnedOf: (n, N) => `${n}/${N}`,
-      credits: 'Bandiere da flag-icons (MIT). Sagome da mledoze/countries (ODbL), basate su Natural Earth. Posizione delle città da Natural Earth (pubblico dominio).',
+      credits: 'Bandiere da flag-icons (MIT). Sagome da mledoze/countries (ODbL), basate su Natural Earth. Posizione delle città da Natural Earth (pubblico dominio). Elenco delle meraviglie creato per questo gioco.',
       cities: 'Città', citiesDesc: 'Trova le città sulla mappa: avvicinati il più possibile.',
+      kinds: { tower: 'Una torre', church: 'Una chiesa o cattedrale', ruins: 'Rovine antiche', palace: 'Un palazzo o castello', bridge: 'Un ponte', statue: 'Una statua', mountain: 'Una montagna', waterfall: 'Una cascata', nature: 'Una meraviglia della natura', monument: 'Un monumento', temple: 'Un tempio, una moschea o una pagoda', pyramid: 'Piramidi', wall: 'Mura antiche', building: 'Un edificio famoso', canal: 'Un canale' },
       capitalOf: c => `Capitale: ${c}`, cityIn: c => `Una città in: ${c}`, kmAway: k => `A ${k.toLocaleString('it-IT')} km`, bullseye: 'Centro perfetto!', closeEnough: 'Ci sei quasi, vale!',
       within: k => `Entro ${k} km è giusto`, mapLabel: r => `Mappa: ${r}. Clicca dove pensi che sia la città`,
-      landmarks: 'Monumenti', landmarksDesc: 'Trova sulla mappa la Torre Eiffel, Machu Picchu e tanti altri.',
-      noun: { flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città' }, Noun: { flags: 'Bandiere', capitals: 'Capitali', shapes: 'Sagome', cities: 'Città' },
-      howTo: 'Come giocare', levelsMode: 'Cinque livelli', allMode: { flags: 'Tutte le bandiere, finché non le sai tutte', capitals: 'Tutte le capitali, finché non le sai tutte', shapes: 'Tutte le sagome, finché non le sai tutte', cities: 'Tutte le città, finché non le sai tutte' },
+      landmarks: 'Meraviglie', landmarksDesc: 'Trova sulla mappa la Torre Eiffel, Machu Picchu e tante altre meraviglie.',
+      noun: { flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città', landmarks: 'meraviglie' }, Noun: { flags: 'Bandiere', capitals: 'Capitali', shapes: 'Sagome', cities: 'Città', landmarks: 'Meraviglie' },
+      howTo: 'Come giocare', levelsMode: 'Cinque livelli', allMode: { flags: 'Tutte le bandiere, finché non le sai tutte', capitals: 'Tutte le capitali, finché non le sai tutte', shapes: 'Tutte le sagome, finché non le sai tutte', cities: 'Tutte le città, finché non le sai tutte', landmarks: 'Tutte le meraviglie, finché non le sai tutte' },
       options: 'Opzioni', change: 'Cambia',
-      qStyle: 'Tipo di domanda', styles: { flags: { find: 'Scegli la bandiera', name: 'Indovina il paese' }, capitals: { find: 'Scegli la capitale', name: 'Indovina il paese' }, shapes: { find: 'Scegli la sagoma', name: 'Indovina il paese' }, cities: { find: 'Trovala sulla mappa', name: 'Trovala sulla mappa' } },
+      qStyle: 'Tipo di domanda', styles: { flags: { find: 'Scegli la bandiera', name: 'Indovina il paese' }, capitals: { find: 'Scegli la capitale', name: 'Indovina il paese' }, shapes: { find: 'Scegli la sagoma', name: 'Indovina il paese' }, cities: { find: 'Trovala sulla mappa', name: 'Trovala sulla mappa' }, landmarks: { find: 'Trovala sulla mappa', name: 'Trovala sulla mappa' } },
       region: 'Regione', theme: 'Tema', playful: 'Giocoso', calm: 'Notte calma',
       regions: { World: 'Mondo', Europe: 'Europa', Asia: 'Asia', Africa: 'Africa', 'North America': 'Nord America', 'South America': 'Sud America', Oceania: 'Oceania' },
       noteLevels: noun => `Nessun cronometro, nessuna fretta. Cinque livelli da ${PER_LEVEL} ${noun}, sempre un po' più difficili. Se sbagli, vedi a cosa corrispondevano tutte le risposte. Alla fine di ogni livello puoi vedere quanto sei stata veloce, se ti incuriosisce.`,
@@ -536,7 +545,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       startLevels: 'Inizia il livello 1', startAll: 'Inizia', resume: (d, n) => `Continua (${d} su ${n} fatte)`, restart: 'Ricomincia',
       learned: (Noun, n, N) => `${Noun} indovinate finora: <b>${n}</b> su ${N}`,
       level: 'Livello', only: r => `Solo ${r}`,
-      ask: { flags: { find: 'Trova la bandiera', name: 'Di chi è questa bandiera?' }, capitals: { find: 'Qual è la capitale?', name: 'Di quale paese è la capitale?' }, shapes: { find: 'Trova la sagoma', name: 'Che paese è questo?' }, cities: { find: 'Dov\'è', name: 'Dov\'è' } },
+      ask: { flags: { find: 'Trova la bandiera', name: 'Di chi è questa bandiera?' }, capitals: { find: 'Qual è la capitale?', name: 'Di quale paese è la capitale?' }, shapes: { find: 'Trova la sagoma', name: 'Che paese è questo?' }, cities: { find: 'Dov\'è', name: 'Dov\'è' }, landmarks: { find: 'Dov\'è', name: 'Dov\'è' } },
       idle: 'Prenditi il tuo tempo. Puoi anche premere <span class="kbd">1</span>–<span class="kbd">6</span> per scegliere.',
       correct: ['Giusto!', 'Esatto!', 'Ottimo!', 'Perfetto!'], quick: 'Veloce!', capital: 'capitale',
       pickedFlag: n => `Hai scelto: ${n}`, notQuite: n => `Non proprio: è ${n}`,
@@ -559,12 +568,12 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const drop = k => { try { localStorage.removeItem(k); } catch (e) {} };
 
-  const learned = { flags: new Set(load('geo-flags-learned', [])), capitals: new Set(load('geo-capitals-learned', [])), shapes: new Set(load('geo-shapes-learned', [])), cities: new Set(load('geo-cities-learned', [])) };
+  const learned = { landmarks: new Set(load('geo-landmarks-learned', [])), flags: new Set(load('geo-flags-learned', [])), capitals: new Set(load('geo-capitals-learned', [])), shapes: new Set(load('geo-shapes-learned', [])), cities: new Set(load('geo-cities-learned', [])) };
   const s0 = load('geo-settings-v2', {});
   const state = {
-    topic: ['flags', 'capitals', 'shapes', 'cities'].includes(s0.topic) ? s0.topic : 'flags',
+    topic: ['flags', 'capitals', 'shapes', 'cities', 'landmarks'].includes(s0.topic) ? s0.topic : 'flags',
     region: REGIONS.includes(s0.region) ? s0.region : 'World',
-    modes: Object.assign({ flags: 'find', capitals: 'find', shapes: 'name', cities: 'find' }, s0.modes || (s0.mode ? { flags: s0.mode } : {})),
+    modes: Object.assign({ flags: 'find', capitals: 'find', shapes: 'name', cities: 'find', landmarks: 'find' }, s0.modes || (s0.mode ? { flags: s0.mode } : {})),
     game: s0.game === 'levels' ? 'levels' : 'all',
     look: s0.look === 'calm' ? 'calm' : 'playful',
     lang: s0.lang === 'it' ? 'it' : (load('geo-flags-settings', {}).lang === 'it' ? 'it' : 'en'),
@@ -607,7 +616,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     return set.filter(f => f.c !== code && f.r === BY[code].r && Math.abs(f.t - BY[code].t) <= 1).map(f => f.c);
   }
   function buildOptions(code, tricky, easyPool, widePool) {
-    if (TP() === 'cities') return [];
+    if (ONMAP(TP())) return [];
     const chosen = new Set([code]);
     for (const c of shuffle(trickyFor(code))) { if (chosen.size > tricky) break; chosen.add(c); }
     for (const f of shuffle(easyPool)) { if (chosen.size >= 6) break; chosen.add(f.c); }
@@ -727,10 +736,10 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
   }
 
   // ---------- passport ----------
-  const TOPICS = ['flags', 'capitals', 'shapes', 'cities'];
+  const TOPICS = ['flags', 'capitals', 'shapes', 'cities', 'landmarks'];
   const STAMP_REGIONS = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'World'];
-  const INK = { flags: '#c8324b', capitals: '#2b62b8', shapes: '#1f8a5b', cities: '#7a4cc2' };
-  function setFor(tp) { return tp === 'capitals' ? CAPITAL_SET : tp === 'shapes' ? SHAPE_SET : tp === 'cities' ? CITY_SET : FLAGS; }
+  const INK = { flags: '#c8324b', capitals: '#2b62b8', shapes: '#1f8a5b', cities: '#7a4cc2', landmarks: '#c2611f' };
+  function setFor(tp) { return tp === 'capitals' ? CAPITAL_SET : tp === 'shapes' ? SHAPE_SET : tp === 'cities' ? CITY_SET : tp === 'landmarks' ? LANDMARK_SET : FLAGS; }
   function stampProgress(tp, r) {
     const set = setFor(tp).filter(f => r === 'World' || f.r === r);
     const n = set.filter(f => learned[tp].has(f.c)).length;
@@ -741,7 +750,8 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     flags: '<path d="M40 64V36M40 37c6-4 12 4 20 0v14c-8 4-14-4-20 0" stroke="currentColor" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>',
     capitals: '<path d="M37 44l13-8 13 8M39 46h22M41 48v12M47 48v12M53 48v12M59 48v12M38 62h24" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
     shapes: '<path d="M38 44c3-6 9-8 13-5s9-2 11 3-1 8 1 12-6 8-11 6-7 2-11-2-6-9-3-14z" fill="currentColor" opacity="0.85"/>',
-    cities: '<path d="M50 63c-6-8-11-14-11-20a11 11 0 0 1 22 0c0 6-5 12-11 20z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="43" r="4" fill="currentColor"/>'
+    cities: '<path d="M50 63c-6-8-11-14-11-20a11 11 0 0 1 22 0c0 6-5 12-11 20z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="43" r="4" fill="currentColor"/>',
+    landmarks: '<path d="M37 63h26M40 59h20M43 59V43M50 59V43M57 59V43M39 42h22l-11-8z" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>'
   };
   function stampSvg(tp, r) {
     const p = stampProgress(tp, r), id = `arc-${tp}-${r.replace(/\s/g, '')}`;
@@ -795,7 +805,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
           </div>
         </div>
         <div class="pp-label">${l.contents}</div>
-        <div class="visas">${TOPICS.map(contents).join('')}${soon('landmarks')}</div>
+        <div class="visas">${TOPICS.map(contents).join('')}</div>
         <div class="mrz" aria-hidden="true">${esc(mrz)}</div>
       </div>`;
       if (TOPICS.includes(kind)) {
@@ -950,8 +960,28 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     if (!globe3.raf) globe3.raf = requestAnimationFrame(globeLoop);
   }
 
+  // ---------- landmark icons (one per kind of place) ----------
+  const KIND_PATH = {
+    tower: 'M32 6L22 58M32 6l10 52M24 44h16M27 28h10M18 58h28',
+    church: 'M32 4v10M28 8h8M20 58V30l12-12 12 12v28M14 58h36M28 58V47a4 4 0 0 1 8 0v11',
+    ruins: 'M14 18h36l-18-8zM12 22h40M18 26v26M28 26v26M38 26v18M46 26v10M10 56h44',
+    palace: 'M10 58V30h8v-8h6v8h16v-8h6v8h8v28zM28 58V46h8v12M10 30l4-6 4 6M46 30l4-6 4 6',
+    bridge: 'M6 40h52M12 40V18M52 40V18M12 20c10 14 30 14 40 0M20 40v-9M28 40v-6M36 40v-6M44 40v-9M6 52c6-4 10-4 16 0s10 4 16 0 10-4 16 0',
+    statue: 'M32 8a5 5 0 1 1 0 10a5 5 0 1 1 0-10zM26 24h12l-2 16h-8zM24 40h16v8H24zM20 48h24v10H20zM38 24l8-12',
+    mountain: 'M4 54l18-30 10 14 8-10 20 26zM18 31l4-7 6 9',
+    waterfall: 'M12 10h40M18 10v30M46 10v30M26 10v36M34 10v40M40 10v32M8 52c6 4 12 4 18 0s12-4 18 0 12 4 14 2',
+    nature: 'M32 58V30M32 30c-10 0-16-8-14-18 10 0 16 8 14 18zM32 40c8 0 14-6 12-14-8 0-14 6-12 14zM18 58h28',
+    monument: 'M20 58V22h24v36M16 22h32M18 14h28v8H18zM28 58V36h8v22M12 58h40',
+    temple: 'M32 4v6M18 20l14-10 14 10zM22 20v8h20v-8M14 32l18-6 18 6zM20 32v10h24V32M10 46l22-6 22 6zM16 46v12h32V46',
+    pyramid: 'M4 56L32 12l28 44zM32 12l6 44M17 36h30',
+    wall: 'M4 44l12-6 10 4 12-8 10 6 12-6v24H4zM16 38v-6h4v4M36 34v-6h4v4M50 36v-6h4v4',
+    building: 'M8 54c4-18 12-26 22-30M30 24c10 4 18 14 24 30M20 54c2-12 6-20 12-24M8 54h48',
+    canal: 'M6 26h52M6 38h52M14 26v-8h10v8M40 26v-8h10v8M6 50c6-4 10-4 16 0s10 4 16 0 10-4 16 0'
+  };
+  const kindIcon = k => `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="${KIND_PATH[k] || KIND_PATH.monument}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   // ---------- cities on a map ----------
-  const MAP_VIEW = { Europe: [-25, 34, 45, 71], Asia: [25, -11, 150, 56], Africa: [-26, -36, 58, 38], 'North America': [-170, 6, -50, 74], 'South America': [-93, -57, -28, 14], Oceania: [110, -48, 190, 10] };
+  const MAP_VIEW = { Europe: [-25, 34, 45, 71], Asia: [25, -11, 150, 56], Africa: [-26, -36, 58, 38], 'North America': [-170, 6, -50, 74], 'South America': [-112, -57, -28, 14], Oceania: [110, -48, 190, 10] };
   const NEAR_KM = { Europe: 150, Asia: 350, Africa: 300, 'North America': 300, 'South America': 250, Oceania: 300 };
   const RAD = Math.PI / 180;
   const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * RAD / 2)) / RAD;
@@ -1022,18 +1052,18 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
 
   // ---------- today's world tour ----------
   const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-  const TOUR_MIX = [['flags', 3], ['capitals', 2], ['shapes', 3], ['cities', 2]];
+  const TOUR_MIX = [['flags', 3], ['capitals', 2], ['shapes', 2], ['cities', 2], ['landmarks', 1]];
   function buildTour() {
     const d = new Date(), r = seeded(d.getFullYear() * 1000 + d.getMonth() * 40 + d.getDate() + 7);
     const used = new Set(), list = [];
     for (const [tp, n] of TOUR_MIX) {
-      const pool = setFor(tp).filter(f => f.t <= (tp === 'cities' ? 3 : 4));
+      const pool = setFor(tp).filter(f => f.t <= (ONMAP(tp) ? 2 : 4));
       let k = 0;
       while (k < n) {
         const f = pool[Math.floor(r() * pool.length)];
         if (used.has(f.c)) continue;
         used.add(f.c); k++;
-        list.push({ code: f.c, topic: tp, mode: tp === 'shapes' ? 'name' : tp === 'cities' ? 'find' : (r() < 0.5 ? 'find' : 'name') });
+        list.push({ code: f.c, topic: tp, mode: tp === 'shapes' ? 'name' : ONMAP(tp) ? 'find' : (r() < 0.5 ? 'find' : 'name') });
       }
     }
     for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
@@ -1068,7 +1098,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
           <div class="stat"><b>${avg ? secs(avg) : '–'}</b><span>${l.avg}</span></div>
           <div class="stat"><b>${l.tomorrow}</b><span>${l.tomorrowNote}</span></div>
         </div>
-        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => m.topic === 'cities' ? reviewCard(m.c, l.kmAway(Math.round(m.picked.km))) : `<div class="card">${m.topic === 'shapes' ? shape(m.c, 'mini') : flag(m.c)}${esc(nm(m.c))}${m.topic === 'capitals' ? `<span>${esc(capOf(m.c))}</span>` : ''}</div>`).join('')}</div>` : ''}
+        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => ONMAP(m.topic) ? reviewCard(m.c, l.kmAway(Math.round(m.picked.km))) : `<div class="card">${m.topic === 'shapes' ? shape(m.c, 'mini') : flag(m.c)}${esc(nm(m.c))}${m.topic === 'capitals' ? `<span>${esc(capOf(m.c))}</span>` : ''}</div>`).join('')}</div>` : ''}
         <div class="btn-row">${sugT ? `<button class="primary" id="sug-btn">${esc(suggestLabel(sugT))}</button>` : ''}<button class="${sugT ? 'ghost' : 'primary'}" id="home-after">${l.backHome}</button></div>
       </div>`;
     wireHeader();
@@ -1128,7 +1158,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
         </div>
       </div>
       <div class="label">${l.orPlay}</div>
-      <div class="gcards">${TOPICS.map(card).join('')}${soon('landmarks')}</div>
+      <div class="gcards">${TOPICS.map(card).join('')}</div>
       <p class="credits">${l.legend} ${l.credits}</p>`;
     wireHeader(); wirePostcard();
     document.getElementById('tour-btn').onclick = startTour;
@@ -1175,7 +1205,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
         <details class="opts" id="opts" ${state.optsOpen ? 'open' : ''}>
           <summary>${l.options}: <span class="cur">${l.styles[tp][state.mode]}</span> · <span class="cur">${rg(state.region)}</span> · <span class="cur">${state.look === 'playful' ? l.playful : l.calm}</span><span class="change">${l.change}</span></summary>
           <div class="opts-body">
-            ${tp === 'cities' ? '' : `<div class="field"><span class="label" id="lbl-mode">${l.qStyle}</span><div class="chips" role="group" aria-labelledby="lbl-mode">
+            ${ONMAP(tp) ? '' : `<div class="field"><span class="label" id="lbl-mode">${l.qStyle}</span><div class="chips" role="group" aria-labelledby="lbl-mode">
               ${chip('mode', 'find', state.mode, l.styles[tp].find)}${chip('mode', 'name', state.mode, l.styles[tp].name)}</div></div>`}
             <div class="field"><span class="label" id="lbl-region">${l.region}</span><div class="chips" role="group" aria-labelledby="lbl-region">
               ${REGIONS.map(r => chip('region', r, state.region, `${rg(r)} <small>${topicSet().filter(f => r === 'World' || f.r === r).length}</small>`)).join('')}</div></div>
@@ -1255,7 +1285,11 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     const ask = l.ask[tp][MD()];
     let prompt, options;
     const pic = c => tp === 'shapes' ? shape(c) : flag(c);
-    if (tp === 'cities') {
+    if (tp === 'landmarks') {
+      const lm = BY[c0];
+      prompt = `<div class="question city-q"><span class="lm-icon" style="--ink:${INK.landmarks}">${kindIcon(lm.kind)}</span><span class="ask">${ask}</span><span class="country">${esc(nm(c0))}</span><span class="hint city-hint">${esc(l.kinds[lm.kind])}</span></div>`;
+      options = cityMapSvg(lm);
+    } else if (tp === 'cities') {
       const city = BY[c0];
       prompt = `<div class="question city-q"><span class="ask">${ask}</span><span class="country">${esc(nm(c0))}</span><span class="hint city-hint">${flag(city.cc, '', 'tiny')}${esc(city.isCap ? l.capitalOf(nm(city.cc)) : l.cityIn(nm(city.cc)))}</span></div>`;
       options = cityMapSvg(city);
@@ -1273,7 +1307,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       <div class="feedback" id="feedback"><span class="idle">${l.idle}</span></div>`;
     wireHeader();
     app.querySelectorAll('#options [data-c]').forEach(b => b.onclick = () => answer(b.dataset.c));
-    if (tp === 'cities') wireCityMap(BY[c0]);
+    if (ONMAP(tp)) wireCityMap(BY[c0]);
     if (!keepTime) state.shownAt = performance.now();
   }
 
@@ -1281,8 +1315,8 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     if (state.answered) return;
     state.answered = true; state.lastPick = c;
     const l = L(), q = state.current, code = q.answer, tp = TP();
-    if (tp === 'cities' && c && c.km == null) c.km = kmBetween(c, BY[code]);
-    const ok = tp === 'cities' ? c.km <= NEAR_KM[BY[code].r] : c === code;
+    if (ONMAP(tp) && c && c.km == null) c.km = kmBetween(c, BY[code]);
+    const ok = ONMAP(tp) ? c.km <= NEAR_KM[BY[code].r] : c === code;
     if (!replaying) {
       const ms = performance.now() - state.shownAt;
       if (ok) { learned[tp].add(code); save(`geo-${tp}-learned`, [...learned[tp]]); }
@@ -1305,11 +1339,13 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     });
     const hudEl = app.querySelector('.hud'); if (hudEl) { state.view = 'answered'; hudEl.outerHTML = hud(); }
     const fb = document.getElementById('feedback');
-    if (tp === 'cities') {
+    if (ONMAP(tp)) {
       const city = BY[code], km = Math.round(c.km), near = NEAR_KM[city.r];
       drawCityResult(city, c, ok);
       const fin = state.game === 'all' ? !state.all.queue.length : state.qIndex === PER_LEVEL - 1 || (state.game === 'tour' && state.qIndex === 9);
-      const facts = `<b>${esc(nm(code))}</b> · ${esc(nm(city.cc))} · ${esc(rg(city.r))}`;
+      const facts = tp === 'landmarks'
+        ? `<b>${esc(nm(code))}</b> · ${esc(state.lang === 'it' ? city.placeIt : city.place)}${city.place === nm(city.cc) ? '' : ', ' + esc(nm(city.cc))}`
+        : `<b>${esc(nm(code))}</b> · ${esc(nm(city.cc))} · ${esc(rg(city.r))}`;
       if (ok) {
         const quick = state.lastMs < QUICK_MS ? `<span class="quick">${bolt}${l.quick}</span>` : '';
         fb.innerHTML = `<div class="msg"><span class="verdict ok">${km <= near / 3 ? l.bullseye : l.closeEnough} ${quick}</span><span class="facts">${l.kmAway(km)} · ${facts}</span></div>`;
@@ -1385,7 +1421,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
           <div class="stat"><b>${fastest ? secs(fastest.ms) : '–'}</b><span>${fastest ? esc(l.quickest(nm(fastest.c))) : l.quickestBare}</span></div>
         </div>
         <div class="pb ${isNew ? 'new' : ''}">${pbLine}${quickCount ? ` · ${l.quickCount(quickCount)}` : ''}</div>
-        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => reviewCard(m.c, TP() === 'cities' ? l.kmAway(Math.round(m.picked.km)) : esc(l.youPicked(pickedName(m.picked))))).join('')}</div>` : ''}
+        ${misses.length ? `<div class="label">${l.review}</div><div class="review">${misses.map(m => reviewCard(m.c, ONMAP(TP()) ? l.kmAway(Math.round(m.picked.km)) : esc(l.youPicked(pickedName(m.picked))))).join('')}</div>` : ''}
         <div class="btn-row">
           ${state.level === LEVELS ? (suggestNext() ? `<button class="primary" id="sug-btn">${esc(suggestLabel(suggestNext()))}</button><button class="ghost" id="again-btn">${l.again}</button>` : `<button class="primary" id="again-btn">${l.again}</button>`) : `<button class="primary" id="next-level">${l.nextLevel(state.level + 1)}</button>`}
           <button class="ghost" id="replay">${l.replay(state.level)}</button>

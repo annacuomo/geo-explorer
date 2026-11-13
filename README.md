@@ -12,7 +12,7 @@ Facebook game *Geo Challenge*, but made for learning rather than racing the cloc
 - **Capitals**: match each of 195 countries to its capital, either way round.
 - **Shapes**: recognise 174 countries from their outline.
 - **Cities**: click on the map as close as you can to 275 cities.
-- **Landmarks**: coming soon.
+- **Landmarks**: find 102 famous places on the map, from the Eiffel Tower to Machu Picchu.
 
 Every game can be played as five levels that get gradually harder, or as "every one until you
 know them all": anything you get wrong comes back at the end. Progress, stamps (one per region
@@ -44,6 +44,7 @@ GitHub Pages serves it straight from this repository.
   python3 build_shapes.py               # data/shapes.json
   python3 build_world.py                # data/world.json
   python3 build_cities.py               # data/cities.json
+  python3 build_landmarks.py            # data/landmarks.json (also checks the coordinates)
   python3 build_page.py                 # index.html
   ```
 
@@ -57,6 +58,7 @@ The game's code is MIT licensed (see [LICENSE](LICENSE)). It is built on open da
 - Country outlines from [mledoze/countries](https://github.com/mledoze/countries) (ODbL),
   based on [Natural Earth](https://www.naturalearthdata.com).
 - City locations from Natural Earth populated places (public domain).
+- The landmark list (`data/landmarks.txt`) was put together for this game.
 - Fonts from Google Fonts: Fredoka, Bricolage Grotesque, Atkinson Hyperlegible (SIL Open Font License).
 
 Built with help from Claude.
