@@ -264,6 +264,9 @@ body[data-look="playful"] .again-note { color: #fff; background: var(--bad); pad
   .pc-inner { flex-direction: column; align-items: flex-start; }
 }
 /* ---------- home ---------- */
+.site-back { align-self: flex-start; margin-bottom: -10px; font-size: 14px; color: var(--ink-soft); text-decoration: none; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); }
+.site-back:hover { color: var(--ink); border-color: var(--ink-soft); }
+body[data-look="playful"] .site-back { background: rgba(255, 255, 255, 0.6); border-color: transparent; color: var(--ink); }
 .home-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
 .hero-text { flex: 1 1 330px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
@@ -455,6 +458,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       pageN: n => `page ${n}`, contents: 'Contents', stampsOn: (n, N) => `${n} of ${N} stamps on this page`, prevPage: 'Previous page', nextPage: 'Next page', spreadN: (a, b) => `${a} / ${b}`,
       pinHint: 'Tap the ? on the globe, or reveal it here.', nextUp: (g, r) => `Next: ${g} · ${r}`, replayTour: "Replay today's tour", tourDoneHero: 'Tour done for today!',
       tourDoneSub: n => `You got ${n}/10. A new tour arrives tomorrow. Where next?`, otherGame: 'Pick another game',
+      backSite: 'More projects by Anna Cuomo',
       home: 'Home', myStamps: (n, N) => `My stamps · ${n} of ${N}`, stampsTitle: 'My stamps',
       tourTitle: "Today's world tour", tourSub: 'Ten questions, a little of everything. Take as long as you like.', tourLabel: "Today's tour",
       mixN: (n, tp) => `${n} ${{ flags: 'flags', capitals: 'capitals', shapes: 'shapes', cities: 'cities' }[tp]}`,
@@ -505,6 +509,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
       pageN: n => `pagina ${n}`, contents: 'Indice', stampsOn: (n, N) => `${n} timbri su ${N} in questa pagina`, prevPage: 'Pagina precedente', nextPage: 'Pagina successiva', spreadN: (a, b) => `${a} / ${b}`,
       pinHint: 'Tocca il ? sul mappamondo, o scoprila qui.', nextUp: (g, r) => `Prossimo: ${g} · ${r}`, replayTour: 'Rifai il giro di oggi', tourDoneHero: 'Giro di oggi fatto!',
       tourDoneSub: n => `Hai fatto ${n}/10. Domani arriva un giro nuovo. E adesso?`, otherGame: 'Scegli un altro gioco',
+      backSite: 'Altri progetti di Anna Cuomo',
       home: 'Home', myStamps: (n, N) => `I miei timbri · ${n} su ${N}`, stampsTitle: 'I miei timbri',
       tourTitle: 'Il giro del mondo di oggi', tourSub: 'Dieci domande, un po\' di tutto. Prenditi tutto il tempo che vuoi.', tourLabel: 'Giro di oggi',
       mixN: (n, tp) => `${n} ${{ flags: 'bandiere', capitals: 'capitali', shapes: 'sagome', cities: 'città' }[tp]}`,
@@ -1099,7 +1104,7 @@ body[data-look="playful"] .summary h2 { font-weight: 700; }
     };
     const soon = tp => `<div class="gcard soon"><span class="gname">${l[tp]}</span><span class="gdesc">${l.coming}</span></div>`;
     const mix = TOUR_MIX.map(([tp, n]) => `<span class="mix" style="--ink:${INK[tp]}"><svg viewBox="30 30 40 40" aria-hidden="true">${ICON[tp]}</svg>${l.mixN(n, tp)}</span>`).join('');
-    app.innerHTML = `${header(false)}
+    app.innerHTML = `<a class="site-back" href="https://annacuomo.github.io/projects/">‹ ${l.backSite}</a>${header(false)}
       <div class="home-hero">
         <div class="hero-text">
           <span class="eyebrow">${esc(date)}</span>
